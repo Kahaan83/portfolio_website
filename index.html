@@ -1626,10 +1626,14 @@ document.querySelectorAll('[data-href]').forEach(el=>{
       else if(idx==5) bits=11512810;
       else            bits=15724526;
       int bx=int(cell.x); int by=int(cell.y);
-      int bit=(4-bx)+5*by;
-      /* GLSL ES 1.0 has no bitwise — simulate with mod/floor */
+      int bit=(4-bx)+5*by; /* ranges 0..24 for a 5x5 glyph */
+      /* GLSL ES 1.0 has no bitwise — simulate with mod/floor.
+         Bug fix: this loop used to cap at i<20, so it could never
+         isolate bits 20..24 (the glyph's bottom row, by==4) — that
+         row always came out corrupted, which is what made the
+         ASCII sweep look garbled/unreadable. Cover the full range. */
       float v=float(bits);
-      for(int i=0;i<20;i++){
+      for(int i=0;i<25;i++){
         if(i==bit) break;
         v=floor(v/2.);
       }
@@ -1672,9 +1676,10 @@ document.querySelectorAll('[data-href]').forEach(el=>{
         float ink=abs(lum-bg);
         float present=smoothstep(.08,.16,ink);
         present*=step(hash(cell+11.3),0.88);
-        /* flicker */
-        float tick=floor(uTime*18.);
-        present*=1.-step(hash(vec2(cell.x*1.3+tick,cell.y*0.7+tick*0.31)),0.35)*0.6;
+        /* flicker — slowed down and softened from the original
+           18 ticks/sec so the glyphs read as text instead of static */
+        float tick=floor(uTime*10.);
+        present*=1.-step(hash(vec2(cell.x*1.3+tick,cell.y*0.7+tick*0.31)),0.22)*0.45;
         /* pick glyph */
         float t=clamp(ink/.4,0.,1.);
         int idx=int(floor(t*6.999));
@@ -1893,21 +1898,14 @@ document.querySelectorAll('[data-href]').forEach(el=>{
 
 /* ══════════════════════════════════════════════════════
    ONEKO — pixel cat that follows your cursor
-   Sprite: 8×4 grid of 32×32 frames (256×128 total).
-   Frames self-contained as data URI (calico palette).
+   Sprite: 8×4 grid of 32×32 frames (256×128 total), loaded
+   from the classic oneko.js sprite sheet.
    ══════════════════════════════════════════════════════ */
 (function initOneko(){
   const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   if(reduce) return;
 
-  /* ── Sprite sheet as a tiny canvas-drawn cat ──
-     Rather than embedding a PNG, we draw the cat procedurally
-     into a spritesheet canvas at 32px frames.
-     We replicate the classic oneko.js 8×4 sprite layout:
-     row 0 = idle/sit, row 1 = walk right, row 2 = walk left,
-     row 3 = scratch. Each row = 2 pose frames.             */
-
-  /* Load the actual classic oneko sprite from CDN (MIT-licensed) */
+  /* Load the classic oneko sprite sheet (8x4 grid of 32px frames, MIT-licensed) */
   const SPRITE_URL='https://raw.githubusercontent.com/adryd325/oneko.js/main/oneko.gif';
 
   const img=new Image();
@@ -1919,6 +1917,15 @@ document.querySelectorAll('[data-href]').forEach(el=>{
   cvs.setAttribute('aria-hidden','true');
   document.body.appendChild(cvs);
   cvs.style.display='none';
+  /* Fixed = viewport space, same space as mouse clientX/clientY.
+     Keeping ONE coordinate space (no absolute+scrollY mixing) is
+     what fixes the jumping/lag when the page is scrolled. Position
+     is driven purely by a GPU-composited transform, never left/top,
+     so moving the cat never forces a layout/paint on the page. */
+  cvs.style.position='fixed';
+  cvs.style.left='0';
+  cvs.style.top='0';
+  cvs.style.willChange='transform';
 
   /* Sprite frame definitions [col, row] in the 8×4 grid */
   const FRAMES={
@@ -1938,12 +1945,16 @@ document.querySelectorAll('[data-href]').forEach(el=>{
     walkSW: [[6,1],[7,1]],
   };
 
-  let catX=32,catY=32;
-  let mouseX=0,mouseY=0;
-  let frameIdx=0,frameTick=0;
-  let state='idle',idleTick=0,idleAnim=null;
-  let lastDir='S';
+  let catX=innerWidth/2,catY=innerHeight/2;
+  let mouseX=catX,mouseY=catY;
   let visible=false;
+
+  /* Idle no longer freezes on one pose — it cycles through
+     sit/scratch/sleep like the original oneko, on a randomized
+     wall-clock timer (not tied to frame count). */
+  let idleState='idle',idleSince=0,idleNext=2200+Math.random()*2200;
+  let poseFrame=0,poseTimer=0;
+  let lastTime=performance.now();
 
   document.addEventListener('mousemove',e=>{
     mouseX=e.clientX;mouseY=e.clientY;
@@ -1953,59 +1964,72 @@ document.querySelectorAll('[data-href]').forEach(el=>{
   img.onload=()=>{
     const ctx=cvs.getContext('2d');
     cvs.width=32;cvs.height=32;
-    let t=0;
 
     function drawFrame(col,row){
       ctx.clearRect(0,0,32,32);
       ctx.drawImage(img,col*32,row*32,32,32,0,0,32,32);
     }
 
-    function getFrames(){
-      const dx=mouseX-catX;const dy=mouseY-catY;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<48){
-        state='idle';
-        const frames=FRAMES.idle;
-        return frames[0];
+    function pickIdlePose(dt){
+      idleSince+=dt;
+      if(idleSince>idleNext){
+        idleSince=0;
+        idleNext=2500+Math.random()*3500;
+        const roll=Math.random();
+        idleState=roll<0.5?'idle':roll<0.75?'scratch':roll<0.9?'sit':'sleep';
+        poseFrame=0;
       }
-      /* direction */
-      const angle=Math.atan2(dy,dx)*180/Math.PI;
-      let dir;
-      if(angle>-22.5&&angle<=22.5)       {dir='E'; lastDir='E';}
-      else if(angle>22.5&&angle<=67.5)   {dir='SE';lastDir='SE';}
-      else if(angle>67.5&&angle<=112.5)  {dir='S'; lastDir='S';}
-      else if(angle>112.5&&angle<=157.5) {dir='SW';lastDir='SW';}
-      else if(angle>157.5||angle<=-157.5){dir='W'; lastDir='W';}
-      else if(angle>-157.5&&angle<=-112.5){dir='NW';lastDir='NW';}
-      else if(angle>-112.5&&angle<=-67.5){dir='N'; lastDir='N';}
-      else                               {dir='NE';lastDir='NE';}
-      state='walk'+dir;
-
-      /* Move cat */
-      const speed=3.5;
-      catX+=Math.cos(angle*Math.PI/180)*speed;
-      catY+=Math.sin(angle*Math.PI/180)*speed;
-
-      /* Position the canvas */
-      cvs.style.left=(catX-16)+'px';
-      cvs.style.top= (catY-16+window.scrollY)+'px';
-      cvs.style.position='absolute';
-
-      const set=FRAMES['walk'+dir]||FRAMES.walkS;
-      return set[frameIdx%set.length];
+      return FRAMES[idleState]||FRAMES.idle;
     }
 
     function tick(now){
-      frameTick++;
-      if(frameTick%6===0){frameIdx++;}
+      /* Clamp dt so a throttled/backgrounded tab doesn't make the
+         cat leap across the screen when the tab regains focus. */
+      const dt=Math.min(64,now-lastTime);
+      lastTime=now;
 
-      const [col,row]=getFrames();
+      const dx=mouseX-catX,dy=mouseY-catY;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+
+      let frames;
+      if(dist<48){
+        frames=pickIdlePose(dt);
+      } else {
+        if(idleState!=='idle'){idleState='idle';idleSince=0;poseFrame=0;}
+        const angle=Math.atan2(dy,dx)*180/Math.PI;
+        let dir;
+        if(angle>-22.5&&angle<=22.5)        dir='E';
+        else if(angle>22.5&&angle<=67.5)    dir='SE';
+        else if(angle>67.5&&angle<=112.5)   dir='S';
+        else if(angle>112.5&&angle<=157.5)  dir='SW';
+        else if(angle>157.5||angle<=-157.5) dir='W';
+        else if(angle>-157.5&&angle<=-112.5)dir='NW';
+        else if(angle>-112.5&&angle<=-67.5) dir='N';
+        else                                 dir='NE';
+
+        /* px/sec instead of px/frame — same speed on every
+           refresh rate, and never overshoots the cursor. */
+        const speed=200;
+        const step=Math.min(dist,speed*dt/1000);
+        catX+=Math.cos(angle*Math.PI/180)*step;
+        catY+=Math.sin(angle*Math.PI/180)*step;
+
+        frames=FRAMES['walk'+dir]||FRAMES.walkS;
+      }
+
+      /* Advance the walk/idle pose on a wall-clock timer rather
+         than a raw requestAnimationFrame counter, so the cadence
+         is identical on a 60Hz or a 120/144Hz screen. */
+      poseTimer+=dt;
+      if(poseTimer>140){poseTimer=0;poseFrame++;}
+      const [col,row]=frames[poseFrame%frames.length];
       drawFrame(col,row);
+
+      cvs.style.transform=`translate3d(${Math.round(catX-16)}px,${Math.round(catY-16)}px,0)`;
 
       requestAnimationFrame(tick);
     }
 
-    cvs.style.left=catX+'px';cvs.style.top=catY+'px';
     requestAnimationFrame(tick);
   };
 
