@@ -385,30 +385,24 @@
     display:grid;
     grid-template-columns:118px 1.05fr 1.25fr auto;
     gap:32px;align-items:start;padding:34px 0;
-    /* border-bottom now on .sw-row-outer */
+    border-bottom:1px solid var(--rule);
     position:relative;cursor:pointer;
     transition:padding-left .3s cubic-bezier(.2,.8,.2,1);
-    width:100%;
   }
-  /* Keep left-bar on standalone .sw-row (non-sweep rows, if any) */
-  .sw-list > .sw-row{border-bottom:1px solid var(--rule)}
-  .sw-list > .sw-row::before{
+  .sw-row::before{
     content:'';position:absolute;left:-40px;top:0;bottom:-1px;
     width:2px;background:var(--signal);
     transform:scaleY(0);transform-origin:top;
     transition:transform .3s cubic-bezier(.2,.8,.2,1);
   }
-  .sw-list > .sw-row:hover{padding-left:14px}
-  .sw-list > .sw-row:hover::before{transform:scaleY(1)}
-  /* Hover padding on the outer wrapper */
-  .sw-row-outer:hover .sw-row{padding-left:14px}
+  .sw-row:hover{padding-left:14px}
+  .sw-row:hover::before{transform:scaleY(1)}
 
   .sw-ref{
     font-family:var(--mono);font-size:11px;color:var(--silk-faint);
     padding-top:5px;letter-spacing:0.03em;
-    transition:color .2s;
   }
-  .sw-row:hover .sw-ref,.sw-row-outer:hover .sw-panel[data-panel="0"] .sw-ref{color:var(--signal)}
+  .sw-row:hover .sw-ref{color:var(--signal)}
 
   .sw-name{
     font-variation-settings:'wdth' 100,'wght' 600;
@@ -644,51 +638,6 @@
   }
   .rv.in{opacity:1;transform:none}
 
-  /* ============ ASCII SWEEP (project cards) ============ */
-  /* The outer wrapper replaces the old sw-row click area */
-  .sw-row-outer{
-    position:relative;overflow:hidden;
-    border-bottom:1px solid var(--rule);
-    cursor:pointer;
-  }
-  /* Both panels stacked; z-index toggled by JS */
-  .sw-panel{
-    position:relative;
-    border-bottom:none!important; /* border now on outer */
-  }
-  .sw-panel-hover{
-    position:absolute;inset:0;
-    z-index:0;
-    /* visible underneath — sweep reveals it */
-  }
-  /* Canvas the WebGL effect writes to */
-  .sw-sweep-canvas{
-    position:absolute;inset:0;
-    width:100%;height:100%;
-    pointer-events:none;z-index:3;
-    opacity:0;transition:opacity .08s;
-  }
-  .sw-sweep-canvas.active{opacity:1}
-  /* Keep the left-edge green bar on the outer wrapper */
-  .sw-row-outer::before{
-    content:'';position:absolute;left:0;top:0;bottom:0;
-    width:2px;background:var(--signal);
-    transform:scaleY(0);transform-origin:top;
-    transition:transform .3s cubic-bezier(.2,.8,.2,1);
-    z-index:4;
-  }
-  .sw-row-outer:hover::before{transform:scaleY(1)}
-
-  /* ============ ONEKO ============ */
-  #oneko-canvas{
-    position:fixed;
-    pointer-events:none;
-    z-index:9998;
-    image-rendering:pixelated;
-    /* 32×32 sprite */
-    width:32px;height:32px;
-  }
-
   /* ============ REDUCED MOTION ============ */
   @media(prefers-reduced-motion:reduce){
     .rv{opacity:1!important;transform:none!important;transition:none!important}
@@ -698,7 +647,6 @@
     .mob-overlay,.mob-panel,.mob-link{transition:none!important;opacity:1!important;transform:none!important}
     .sw-row,.hw-card,.ct-link,.nav-links a,.act{transition:none!important}
     #board-canvas{will-change:auto}
-    #oneko-canvas{display:none!important}
   }
 
   /* ============ RESPONSIVE ============ */
@@ -931,129 +879,61 @@
 
     <div class="sw-list">
 
-      <div class="sw-row-outer rv" data-href="https://github.com/Kahaan83/ime-data-pipeline" data-sweep>
-        <canvas class="sw-sweep-canvas" aria-hidden="true"></canvas>
-        <!-- Panel A: resting -->
-        <div class="sw-row sw-panel" data-panel="0">
-          <div class="sw-ref">ime-pipeline</div>
-          <div>
-            <h3 class="sw-name">Economic data pipeline, NIC 27</h3>
-            <div class="sw-stack">Python · pandas · LaTeX</div>
-          </div>
-          <p class="sw-desc">
-            Ingests and reconciles production, trade and employment data for India's electrical equipment sector across inconsistent government sources. Built during the IME internship to replace manual spreadsheet work — the analysis that came out of it feeds published research.
-          </p>
-          <div class="sw-actions">
-            <a href="https://github.com/Kahaan83/ime-data-pipeline" target="_blank" rel="noopener noreferrer" class="sw-open">Open repo →</a>
-          </div>
+      <div class="sw-row rv" data-href="https://github.com/Kahaan83/ime-data-pipeline">
+        <div class="sw-ref">ime-pipeline</div>
+        <div>
+          <h3 class="sw-name">Economic data pipeline, NIC 27</h3>
+          <div class="sw-stack">Python · pandas · LaTeX</div>
         </div>
-        <!-- Panel B: hovered (identical content, different background — sweep reveals it) -->
-        <div class="sw-row sw-panel sw-panel-hover" data-panel="1" aria-hidden="true">
-          <div class="sw-ref" style="color:var(--signal)">ime-pipeline</div>
-          <div>
-            <h3 class="sw-name">Economic data pipeline, NIC 27</h3>
-            <div class="sw-stack" style="color:var(--silk-mute)">Python · pandas · LaTeX</div>
-          </div>
-          <p class="sw-desc" style="color:var(--silk)">
-            Ingests and reconciles production, trade and employment data for India's electrical equipment sector across inconsistent government sources. Built during the IME internship to replace manual spreadsheet work — the analysis that came out of it feeds published research.
-          </p>
-          <div class="sw-actions">
-            <a tabindex="-1" href="https://github.com/Kahaan83/ime-data-pipeline" target="_blank" rel="noopener noreferrer" class="sw-open" style="color:var(--signal)">Open repo →</a>
-          </div>
+        <p class="sw-desc">
+          Ingests and reconciles production, trade and employment data for India's electrical equipment sector across inconsistent government sources. Built during the IME internship to replace manual spreadsheet work — the analysis that came out of it feeds published research.
+        </p>
+        <div class="sw-actions">
+          <a href="https://github.com/Kahaan83/ime-data-pipeline" target="_blank" rel="noopener noreferrer" class="sw-open">Open repo →</a>
         </div>
       </div>
 
-      <div class="sw-row-outer rv" data-href="https://github.com/Kahaan83/digital-cards" data-sweep>
-        <canvas class="sw-sweep-canvas" aria-hidden="true"></canvas>
-        <div class="sw-row sw-panel" data-panel="0">
-          <div class="sw-ref">digital-cards</div>
-          <div>
-            <h3 class="sw-name">NFC profile cards</h3>
-            <div class="sw-stack">Next.js · Tailwind · NFC</div>
-          </div>
-          <p class="sw-desc">
-            Tap a card or a standee with a phone and it opens a digital profile the owner can edit afterwards. Started as a side idea and turned into a product question — the hard part isn't the NFC, it's making the profile worth updating.
-          </p>
-          <div class="sw-actions">
-            <a href="https://github.com/Kahaan83/digital-cards" target="_blank" rel="noopener noreferrer" class="sw-open">Open repo →</a>
-            <a href="https://digital-cards-lemon.vercel.app" target="_blank" rel="noopener noreferrer" class="sw-demo"><span class="sw-live-dot" aria-hidden="true"></span>Live demo ↗</a>
-          </div>
+      <div class="sw-row rv" data-href="https://github.com/Kahaan83/digital-cards">
+        <div class="sw-ref">digital-cards</div>
+        <div>
+          <h3 class="sw-name">NFC profile cards</h3>
+          <div class="sw-stack">Next.js · Tailwind · NFC</div>
         </div>
-        <div class="sw-row sw-panel sw-panel-hover" data-panel="1" aria-hidden="true">
-          <div class="sw-ref" style="color:var(--signal)">digital-cards</div>
-          <div>
-            <h3 class="sw-name">NFC profile cards</h3>
-            <div class="sw-stack" style="color:var(--silk-mute)">Next.js · Tailwind · NFC</div>
-          </div>
-          <p class="sw-desc" style="color:var(--silk)">
-            Tap a card or a standee with a phone and it opens a digital profile the owner can edit afterwards. Started as a side idea and turned into a product question — the hard part isn't the NFC, it's making the profile worth updating.
-          </p>
-          <div class="sw-actions">
-            <a tabindex="-1" href="https://github.com/Kahaan83/digital-cards" target="_blank" rel="noopener noreferrer" class="sw-open" style="color:var(--signal)">Open repo →</a>
-            <a tabindex="-1" href="https://digital-cards-lemon.vercel.app" target="_blank" rel="noopener noreferrer" class="sw-demo"><span class="sw-live-dot" aria-hidden="true"></span>Live demo ↗</a>
-          </div>
+        <p class="sw-desc">
+          Tap a card or a standee with a phone and it opens a digital profile the owner can edit afterwards. Started as a side idea and turned into a product question — the hard part isn't the NFC, it's making the profile worth updating.
+        </p>
+        <div class="sw-actions">
+          <a href="https://github.com/Kahaan83/digital-cards" target="_blank" rel="noopener noreferrer" class="sw-open">Open repo →</a>
+          <a href="https://digital-cards-lemon.vercel.app" target="_blank" rel="noopener noreferrer" class="sw-demo"><span class="sw-live-dot" aria-hidden="true"></span>Live demo ↗</a>
         </div>
       </div>
 
-      <div class="sw-row-outer rv" data-href="https://padmavati-website-green.vercel.app/" data-sweep>
-        <canvas class="sw-sweep-canvas" aria-hidden="true"></canvas>
-        <div class="sw-row sw-panel" data-panel="0">
-          <div class="sw-ref">padmavati-web</div>
-          <div>
-            <h3 class="sw-name">Padmavati Enterprise</h3>
-            <div class="sw-stack">Next.js 14 · Tailwind · Vercel</div>
-          </div>
-          <p class="sw-desc">
-            Production site for the family healthcare print business, built to support expansion beyond Gujarat. Real client, real constraints, real traffic — plus the listings, reviews and verification work that sits behind it.
-          </p>
-          <div class="sw-actions">
-            <a href="https://padmavati-website-green.vercel.app/" target="_blank" rel="noopener noreferrer" class="sw-open"><span class="sw-live-dot" aria-hidden="true"></span> Visit site →</a>
-          </div>
+      <div class="sw-row rv" data-href="https://padmavati-website-green.vercel.app/">
+        <div class="sw-ref">padmavati-web</div>
+        <div>
+          <h3 class="sw-name">Padmavati Enterprise</h3>
+          <div class="sw-stack">Next.js 14 · Tailwind · Vercel</div>
         </div>
-        <div class="sw-row sw-panel sw-panel-hover" data-panel="1" aria-hidden="true">
-          <div class="sw-ref" style="color:var(--signal)">padmavati-web</div>
-          <div>
-            <h3 class="sw-name">Padmavati Enterprise</h3>
-            <div class="sw-stack" style="color:var(--silk-mute)">Next.js 14 · Tailwind · Vercel</div>
-          </div>
-          <p class="sw-desc" style="color:var(--silk)">
-            Production site for the family healthcare print business, built to support expansion beyond Gujarat. Real client, real constraints, real traffic — plus the listings, reviews and verification work that sits behind it.
-          </p>
-          <div class="sw-actions">
-            <a tabindex="-1" href="https://padmavati-website-green.vercel.app/" target="_blank" rel="noopener noreferrer" class="sw-open" style="color:var(--signal)"><span class="sw-live-dot" aria-hidden="true"></span> Visit site →</a>
-          </div>
+        <p class="sw-desc">
+          Production site for the family healthcare print business, built to support expansion beyond Gujarat. Real client, real constraints, real traffic — plus the listings, reviews and verification work that sits behind it.
+        </p>
+        <div class="sw-actions">
+          <a href="https://padmavati-website-green.vercel.app/" target="_blank" rel="noopener noreferrer" class="sw-open"><span class="sw-live-dot" aria-hidden="true"></span> Visit site →</a>
         </div>
       </div>
 
-      <div class="sw-row-outer rv" data-href="https://escape-room-website-beta.vercel.app/" data-sweep>
-        <canvas class="sw-sweep-canvas" aria-hidden="true"></canvas>
-        <div class="sw-row sw-panel" data-panel="0">
-          <div class="sw-ref">escape-room</div>
-          <div>
-            <h3 class="sw-name">Escape room, in the browser</h3>
-            <div class="sw-stack">JavaScript · CSS · state machines</div>
-          </div>
-          <p class="sw-desc">
-            A puzzle-driven web experience with timed challenges and staged reveals. Mostly an excuse to get properly good at animation, state handling and pacing without a framework doing the work.
-          </p>
-          <div class="sw-actions">
-            <a href="https://github.com/Kahaan83/escape-room-website" target="_blank" rel="noopener noreferrer" class="sw-open">Open repo →</a>
-            <a href="https://escape-room-website-beta.vercel.app/" target="_blank" rel="noopener noreferrer" class="sw-demo"><span class="sw-live-dot" aria-hidden="true"></span>Play it ↗</a>
-          </div>
+      <div class="sw-row rv" data-href="https://escape-room-website-beta.vercel.app/">
+        <div class="sw-ref">escape-room</div>
+        <div>
+          <h3 class="sw-name">Escape room, in the browser</h3>
+          <div class="sw-stack">JavaScript · CSS · state machines</div>
         </div>
-        <div class="sw-row sw-panel sw-panel-hover" data-panel="1" aria-hidden="true">
-          <div class="sw-ref" style="color:var(--signal)">escape-room</div>
-          <div>
-            <h3 class="sw-name">Escape room, in the browser</h3>
-            <div class="sw-stack" style="color:var(--silk-mute)">JavaScript · CSS · state machines</div>
-          </div>
-          <p class="sw-desc" style="color:var(--silk)">
-            A puzzle-driven web experience with timed challenges and staged reveals. Mostly an excuse to get properly good at animation, state handling and pacing without a framework doing the work.
-          </p>
-          <div class="sw-actions">
-            <a tabindex="-1" href="https://github.com/Kahaan83/escape-room-website" target="_blank" rel="noopener noreferrer" class="sw-open" style="color:var(--signal)">Open repo →</a>
-            <a tabindex="-1" href="https://escape-room-website-beta.vercel.app/" target="_blank" rel="noopener noreferrer" class="sw-demo"><span class="sw-live-dot" aria-hidden="true"></span>Play it ↗</a>
-          </div>
+        <p class="sw-desc">
+          A puzzle-driven web experience with timed challenges and staged reveals. Mostly an excuse to get properly good at animation, state handling and pacing without a framework doing the work.
+        </p>
+        <div class="sw-actions">
+          <a href="https://github.com/Kahaan83/escape-room-website" target="_blank" rel="noopener noreferrer" class="sw-open">Open repo →</a>
+          <a href="https://escape-room-website-beta.vercel.app/" target="_blank" rel="noopener noreferrer" class="sw-demo"><span class="sw-live-dot" aria-hidden="true"></span>Play it ↗</a>
         </div>
       </div>
 
@@ -1584,459 +1464,6 @@ document.querySelectorAll('[data-href]').forEach(el=>{
   menu.addEventListener('click',e=>{
     if(e.target===menu) closeMenu();
   });
-})();
-
-/* ══════════════════════════════════════════════════════
-   ASCII SWEEP — vanilla WebGL implementation
-   Fires on hover over each [data-sweep] project row.
-   Sweeps from panel-0 (resting) to panel-1 (highlighted)
-   using a lightweight WebGL shader inspired by the
-   Canvas UI AsciiSweep component.
-   ══════════════════════════════════════════════════════ */
-(function initAsciiSweep(){
-  const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  if(reduce) return;
-
-  const VERT=`
-    attribute vec2 aPos;
-    varying vec2 vUv;
-    void main(){
-      vUv=aPos*.5+.5;
-      gl_Position=vec4(aPos,0.,1.);
-    }`;
-
-  const FRAG=`
-    precision mediump float;
-    varying vec2 vUv;
-    uniform sampler2D uFrom,uTo;
-    uniform float uProg;
-    uniform float uTime;
-    uniform vec2 uRes;
-
-    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.54);}
-
-    /* 5×5 bitmap glyphs, dark→bright */
-    float glyph(int idx,vec2 cell){
-      int bits;
-      if(idx==0)      bits=0;
-      else if(idx==1) bits=131200;
-      else if(idx==2) bits=459200;
-      else if(idx==3) bits=4357252;
-      else if(idx==4) bits=18157905;
-      else if(idx==5) bits=11512810;
-      else            bits=15724526;
-      int bx=int(cell.x); int by=int(cell.y);
-      int bit=(4-bx)+5*by; /* ranges 0..24 for a 5x5 glyph */
-      /* GLSL ES 1.0 has no bitwise — simulate with mod/floor.
-         Bug fix: this loop used to cap at i<20, so it could never
-         isolate bits 20..24 (the glyph's bottom row, by==4) — that
-         row always came out corrupted, which is what made the
-         ASCII sweep look garbled/unreadable. Cover the full range. */
-      float v=float(bits);
-      for(int i=0;i<25;i++){
-        if(i==bit) break;
-        v=floor(v/2.);
-      }
-      return mod(v,2.);
-    }
-
-    void main(){
-      float band=0.32;
-      float prog=uProg;
-
-      /* sweep axis: left→right */
-      float axis=vUv.x;
-
-      /* ragged edge per row */
-      float rowSeed=hash(vec2(floor(vUv.y*40.),7.))-0.5;
-      float jitter=rowSeed*0.06;
-      float head=prog*(1.+band*1.6);
-      float behind=head-(axis+jitter);
-
-      float enter=smoothstep(0.,0.04,behind);
-      float leave=1.-smoothstep(band,band*1.7,behind);
-      float ascii=enter*leave;
-
-      float swap=smoothstep(band*.3,band*.65,behind);
-
-      vec4 colA=texture2D(uFrom,vec2(vUv.x,1.-vUv.y));
-      vec4 colB=texture2D(uTo,  vec2(vUv.x,1.-vUv.y));
-      vec3 base=mix(colA.rgb,colB.rgb,swap);
-      float alpha=max(colA.a,colB.a);
-
-      if(ascii>0.002){
-        /* cell size in pixels */
-        float cellPx=14.;
-        vec2 frag=vUv*uRes;
-        vec2 cell=floor(frag/cellPx);
-        vec2 cellUv=(cell+.5)*cellPx/uRes;
-        vec4 cellCol=texture2D(uFrom,vec2(cellUv.x,1.-cellUv.y));
-        float lum=dot(cellCol.rgb,vec3(.299,.587,.114));
-        float bg=0.055; /* --board in linear approx */
-        float ink=abs(lum-bg);
-        float present=smoothstep(.08,.16,ink);
-        present*=step(hash(cell+11.3),0.88);
-        /* flicker — slowed down and softened from the original
-           18 ticks/sec so the glyphs read as text instead of static */
-        float tick=floor(uTime*10.);
-        present*=1.-step(hash(vec2(cell.x*1.3+tick,cell.y*0.7+tick*0.31)),0.22)*0.45;
-        /* pick glyph */
-        float t=clamp(ink/.4,0.,1.);
-        int idx=int(floor(t*6.999));
-        vec2 local=frag-cell*cellPx;
-        local=local/cellPx*5.;
-        float on=glyph(idx,local)*present;
-        vec3 ink_color=vec3(.24,.86,.52); /* --signal */
-        float level=0.7+0.3*hash(cell*.91+7.7);
-        base=mix(base,ink_color*level,on*ascii);
-        alpha=max(alpha,on*ascii);
-      }
-
-      gl_FragColor=vec4(base,alpha*min(1.,uProg*4.+leave*.8));
-    }`;
-
-  function makeGL(canvas){
-    const gl=canvas.getContext('webgl',{alpha:true,premultipliedAlpha:true});
-    if(!gl) return null;
-
-    function shader(type,src){
-      const s=gl.createShader(type);
-      gl.shaderSource(s,src);gl.compileShader(s);
-      if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){
-        console.warn('AsciiSweep shader error:',gl.getShaderInfoLog(s));
-        return null;
-      }
-      return s;
-    }
-    const vs=shader(gl.VERTEX_SHADER,VERT);
-    const fs=shader(gl.FRAGMENT_SHADER,FRAG);
-    if(!vs||!fs) return null;
-    const prog=gl.createProgram();
-    gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
-    if(!gl.getProgramParameter(prog,gl.LINK_STATUS)) return null;
-
-    const buf=gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER,buf);
-    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
-
-    gl.useProgram(prog);
-    const aPos=gl.getAttribLocation(prog,'aPos');
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
-
-    const uFrom=gl.getUniformLocation(prog,'uFrom');
-    const uTo=  gl.getUniformLocation(prog,'uTo');
-    const uProg=gl.getUniformLocation(prog,'uProg');
-    const uTime=gl.getUniformLocation(prog,'uTime');
-    const uRes= gl.getUniformLocation(prog,'uRes');
-
-    function makeTex(el){
-      const t=gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D,t);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
-      uploadEl(t,el);
-      return t;
-    }
-
-    function uploadEl(tex,el){
-      /* Snapshot the DOM element to a canvas, then upload */
-      const tmp=document.createElement('canvas');
-      const dpr=Math.min(window.devicePixelRatio||1,2);
-      const r=el.getBoundingClientRect();
-      tmp.width=Math.max(1,Math.round(r.width*dpr));
-      tmp.height=Math.max(1,Math.round(r.height*dpr));
-      const ctx2=tmp.getContext('2d');
-      /* Fill background colour */
-      ctx2.fillStyle='#0d1c15';
-      ctx2.fillRect(0,0,tmp.width,tmp.height);
-      /* We can't use drawElementImage (non-standard); instead we
-         sample text colours by painting simple blocks.
-         The shader handles the ASCII character layer itself —
-         we just need the rough luminance map of each panel. */
-      /* Walk text nodes and paint rough rects for them */
-      function paintNode(node,parentX,parentY){
-        if(node.nodeType===Node.ELEMENT_NODE){
-          const style=getComputedStyle(node);
-          const nr=node.getBoundingClientRect();
-          const x=(nr.left-r.left)*dpr;
-          const y=(nr.top-r.top)*dpr;
-          const w=nr.width*dpr;
-          const h=nr.height*dpr;
-          if(w>0&&h>0&&style.display!=='none'){
-            if(style.backgroundColor&&style.backgroundColor!=='rgba(0, 0, 0, 0)'&&style.backgroundColor!=='transparent'){
-              ctx2.fillStyle=style.backgroundColor;
-              ctx2.fillRect(x,y,w,h);
-            }
-            node.childNodes.forEach(c=>paintNode(c,x,y));
-          }
-        } else if(node.nodeType===Node.TEXT_NODE&&node.textContent.trim()){
-          const range=document.createRange();
-          range.selectNodeContents(node);
-          const rects=range.getClientRects();
-          const pStyle=getComputedStyle(node.parentElement);
-          ctx2.fillStyle=pStyle.color||'#e9efea';
-          ctx2.font=`${pStyle.fontWeight} ${parseFloat(pStyle.fontSize)*dpr}px ${pStyle.fontFamily}`;
-          for(const rect of rects){
-            /* paint a bright rect where text lives */
-            ctx2.fillRect(
-              (rect.left-r.left)*dpr,
-              (rect.top-r.top)*dpr,
-              rect.width*dpr,
-              rect.height*dpr*0.7
-            );
-          }
-        }
-      }
-      paintNode(el,0,0);
-      gl.bindTexture(gl.TEXTURE_2D,tex);
-      gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,tmp);
-    }
-
-    return {gl,prog,uFrom,uTo,uProg,uTime,uRes,makeTex,uploadEl};
-  }
-
-  /* ── wire up each sweep row ── */
-  document.querySelectorAll('[data-sweep]').forEach(outer=>{
-    const cvs=outer.querySelector('.sw-sweep-canvas');
-    const panelA=outer.querySelector('[data-panel="0"]');
-    const panelB=outer.querySelector('[data-panel="1"]');
-    if(!cvs||!panelA||!panelB) return;
-
-    /* Size canvas */
-    function sizeCanvas(){
-      const dpr=Math.min(window.devicePixelRatio||1,2);
-      const r=outer.getBoundingClientRect();
-      cvs.width=Math.round(r.width*dpr);
-      cvs.height=Math.round(r.height*dpr);
-      cvs.style.width=r.width+'px';
-      cvs.style.height=r.height+'px';
-    }
-    sizeCanvas();
-
-    const ctx=makeGL(cvs);
-    if(!ctx) return; /* WebGL unavailable */
-
-    /* Ensure panel B is invisible until swept to */
-    panelB.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:1;';
-    panelA.style.cssText='position:relative;z-index:2;';
-
-    let texA=null,texB=null;
-    let sweeping=false,direction=1,progress=0;
-    let rafId=0,startTime=0;
-    const DURATION=0.9; /* seconds */
-
-    function ensureTextures(){
-      if(!texA) texA=ctx.makeTex(panelA);
-      if(!texB){ctx.uploadEl(texA,panelA);texB=ctx.makeTex(panelB)}
-    }
-
-    function render(now){
-      const t=Math.min(1,(now-startTime)/1000/DURATION);
-      progress=direction===1?ease(t):1-ease(t);
-
-      const gl=ctx.gl;
-      const w=cvs.width,h=cvs.height;
-      gl.viewport(0,0,w,h);
-      gl.clearColor(0,0,0,0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.enable(gl.BLEND);
-      gl.blendFuncSeparate(gl.ONE,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
-      gl.useProgram(ctx.prog);
-
-      gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texA);gl.uniform1i(ctx.uFrom,0);
-      gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,texB);gl.uniform1i(ctx.uTo,1);
-      gl.uniform1f(ctx.uProg,progress);
-      gl.uniform1f(ctx.uTime,now/1000);
-      gl.uniform2f(ctx.uRes,w,h);
-      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-
-      if(t<1){
-        rafId=requestAnimationFrame(render);
-      } else {
-        sweeping=false;
-        cvs.classList.remove('active');
-        /* show the destination panel's real DOM */
-        if(direction===1){
-          panelA.style.zIndex='1';panelB.style.zIndex='2';
-          panelB.style.pointerEvents='';
-          panelA.style.pointerEvents='none';
-        } else {
-          panelA.style.zIndex='2';panelB.style.zIndex='1';
-          panelB.style.pointerEvents='none';
-          panelA.style.pointerEvents='';
-        }
-      }
-    }
-
-    function ease(t){const c=1-Math.min(t,1);return 1-c*c*c}
-
-    function startSweep(dir){
-      cancelAnimationFrame(rafId);
-      direction=dir;
-      ensureTextures();
-      sweeping=true;
-      cvs.classList.add('active');
-      /* Hide both real panels during sweep */
-      panelA.style.zIndex='1';panelB.style.zIndex='1';
-      panelA.style.pointerEvents='none';panelB.style.pointerEvents='none';
-      sizeCanvas();
-      startTime=performance.now();
-      rafId=requestAnimationFrame(render);
-    }
-
-    outer.addEventListener('mouseenter',()=>{if(!sweeping||direction!==1) startSweep(1)});
-    outer.addEventListener('mouseleave',()=>{if(!sweeping||direction!==0) startSweep(0)});
-
-    /* Keyboard: treat focus-within as hover */
-    outer.addEventListener('focusin', ()=>{if(!sweeping||direction!==1) startSweep(1)});
-    outer.addEventListener('focusout',e=>{if(!outer.contains(e.relatedTarget)) startSweep(0)});
-  });
-})();
-
-/* ══════════════════════════════════════════════════════
-   ONEKO — pixel cat that follows your cursor
-   Sprite: 8×4 grid of 32×32 frames (256×128 total), loaded
-   from the classic oneko.js sprite sheet.
-   ══════════════════════════════════════════════════════ */
-(function initOneko(){
-  const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  if(reduce) return;
-
-  /* Load the classic oneko sprite sheet (8x4 grid of 32px frames, MIT-licensed) */
-  const SPRITE_URL='https://raw.githubusercontent.com/adryd325/oneko.js/main/oneko.gif';
-
-  const img=new Image();
-  img.crossOrigin='anonymous';
-  img.src=SPRITE_URL;
-
-  const cvs=document.createElement('canvas');
-  cvs.id='oneko-canvas';
-  cvs.setAttribute('aria-hidden','true');
-  document.body.appendChild(cvs);
-  cvs.style.display='none';
-  /* Fixed = viewport space, same space as mouse clientX/clientY.
-     Keeping ONE coordinate space (no absolute+scrollY mixing) is
-     what fixes the jumping/lag when the page is scrolled. Position
-     is driven purely by a GPU-composited transform, never left/top,
-     so moving the cat never forces a layout/paint on the page. */
-  cvs.style.position='fixed';
-  cvs.style.left='0';
-  cvs.style.top='0';
-  cvs.style.willChange='transform';
-
-  /* Sprite frame definitions [col, row] in the 8×4 grid */
-  const FRAMES={
-    idle:   [[0,3]],
-    sit:    [[1,3]],
-    alert:  [[2,3]],
-    scratch:[[0,1],[1,1]],
-    tired:  [[3,3]],
-    sleep:  [[2,1],[3,1]],
-    walkE:  [[0,2],[1,2]],
-    walkW:  [[2,2],[3,2]],
-    walkN:  [[4,2],[5,2]],
-    walkS:  [[6,2],[7,2]],
-    walkNE: [[4,0],[5,0]],
-    walkSE: [[6,0],[7,0]],
-    walkNW: [[4,1],[5,1]],
-    walkSW: [[6,1],[7,1]],
-  };
-
-  let catX=innerWidth/2,catY=innerHeight/2;
-  let mouseX=catX,mouseY=catY;
-  let visible=false;
-
-  /* Idle no longer freezes on one pose — it cycles through
-     sit/scratch/sleep like the original oneko, on a randomized
-     wall-clock timer (not tied to frame count). */
-  let idleState='idle',idleSince=0,idleNext=2200+Math.random()*2200;
-  let poseFrame=0,poseTimer=0;
-  let lastTime=performance.now();
-
-  document.addEventListener('mousemove',e=>{
-    mouseX=e.clientX;mouseY=e.clientY;
-    if(!visible){visible=true;cvs.style.display='block';}
-  },{passive:true});
-
-  img.onload=()=>{
-    const ctx=cvs.getContext('2d');
-    cvs.width=32;cvs.height=32;
-
-    function drawFrame(col,row){
-      ctx.clearRect(0,0,32,32);
-      ctx.drawImage(img,col*32,row*32,32,32,0,0,32,32);
-    }
-
-    function pickIdlePose(dt){
-      idleSince+=dt;
-      if(idleSince>idleNext){
-        idleSince=0;
-        idleNext=2500+Math.random()*3500;
-        const roll=Math.random();
-        idleState=roll<0.5?'idle':roll<0.75?'scratch':roll<0.9?'sit':'sleep';
-        poseFrame=0;
-      }
-      return FRAMES[idleState]||FRAMES.idle;
-    }
-
-    function tick(now){
-      /* Clamp dt so a throttled/backgrounded tab doesn't make the
-         cat leap across the screen when the tab regains focus. */
-      const dt=Math.min(64,now-lastTime);
-      lastTime=now;
-
-      const dx=mouseX-catX,dy=mouseY-catY;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-
-      let frames;
-      if(dist<48){
-        frames=pickIdlePose(dt);
-      } else {
-        if(idleState!=='idle'){idleState='idle';idleSince=0;poseFrame=0;}
-        const angle=Math.atan2(dy,dx)*180/Math.PI;
-        let dir;
-        if(angle>-22.5&&angle<=22.5)        dir='E';
-        else if(angle>22.5&&angle<=67.5)    dir='SE';
-        else if(angle>67.5&&angle<=112.5)   dir='S';
-        else if(angle>112.5&&angle<=157.5)  dir='SW';
-        else if(angle>157.5||angle<=-157.5) dir='W';
-        else if(angle>-157.5&&angle<=-112.5)dir='NW';
-        else if(angle>-112.5&&angle<=-67.5) dir='N';
-        else                                 dir='NE';
-
-        /* px/sec instead of px/frame — same speed on every
-           refresh rate, and never overshoots the cursor. */
-        const speed=200;
-        const step=Math.min(dist,speed*dt/1000);
-        catX+=Math.cos(angle*Math.PI/180)*step;
-        catY+=Math.sin(angle*Math.PI/180)*step;
-
-        frames=FRAMES['walk'+dir]||FRAMES.walkS;
-      }
-
-      /* Advance the walk/idle pose on a wall-clock timer rather
-         than a raw requestAnimationFrame counter, so the cadence
-         is identical on a 60Hz or a 120/144Hz screen. */
-      poseTimer+=dt;
-      if(poseTimer>140){poseTimer=0;poseFrame++;}
-      const [col,row]=frames[poseFrame%frames.length];
-      drawFrame(col,row);
-
-      cvs.style.transform=`translate3d(${Math.round(catX-16)}px,${Math.round(catY-16)}px,0)`;
-
-      requestAnimationFrame(tick);
-    }
-
-    requestAnimationFrame(tick);
-  };
-
-  img.onerror=()=>{
-    /* Sprite failed to load (CORS or network) — remove canvas gracefully */
-    cvs.remove();
-  };
 })();
 </script>
 </body>
