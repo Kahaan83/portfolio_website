@@ -645,6 +645,29 @@
   .sw-row:has(:focus-visible) .sw-ref,.sw-row:has(:focus-visible) .sw-open{color:var(--signal)}
   .hw-card:has(:focus-visible){background:var(--mask-lit)}
 
+  /* ============ NET HIGHLIGHT (KiCad-style) ============ */
+  main{position:relative}
+  #nets{position:absolute;left:0;top:0;z-index:5;pointer-events:none;overflow:visible}
+  #nets path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .net-base{stroke:rgba(196,131,74,0.17);stroke-width:1;transition:opacity .25s}
+  .net-glow{stroke:var(--signal);stroke-width:7;opacity:0;transition:opacity .25s}
+  .net-lit{stroke:var(--signal);stroke-width:1.6;opacity:0;transition:opacity .2s}
+  .net-pulse{stroke:#d9ffe9;stroke-width:2.4;opacity:0;stroke-dasharray:10 110}
+  .net-pad,.net-end{fill:var(--board-deep);stroke:rgba(196,131,74,0.55);stroke-width:1;transition:fill .2s,stroke .2s,opacity .25s}
+  #nets.has-active .net:not(.on) .net-base{opacity:.3}
+  #nets.has-active .net:not(.on) .net-pad,#nets.has-active .net:not(.on) .net-end{opacity:.35}
+  .net.on .net-glow{opacity:.17}
+  .net.on .net-lit{opacity:1}
+  .net.on .net-pulse{opacity:1;animation:netflow .6s linear infinite}
+  .net.on .net-pad,.net.on .net-end{fill:var(--signal);stroke:var(--signal)}
+  @keyframes netflow{to{stroke-dashoffset:-120}}
+  /* The trace replaces the little accent bar on project rows */
+  html.nets-on .sw-row::before{display:none}
+  @media(prefers-reduced-motion:reduce){
+    .net-pulse{display:none}
+    .net-base,.net-glow,.net-lit,.net-pad,.net-end{transition:none}
+  }
+
   /* ============ REVEAL ============ */
   .rv{
     opacity:0;transform:translateY(22px);
@@ -1437,6 +1460,132 @@ document.querySelectorAll('[data-m]').forEach(a=>{
     if(v) v.textContent=m;
   }catch(e){}
 });
+
+/* ── Net highlighting ─────────────────────────────────────────
+   A bus of copper traces runs down the left margin from the hero's
+   edge connector. Hover (or keyboard-focus) a project and its net
+   lights up end to end, like clicking a net in KiCad. Desktop with a
+   real pointer only; the mobile layout has no margin to route in. */
+(function(){
+  const main=document.getElementById('main');
+  const hero=document.getElementById('hero');
+  if(!main||!hero||!window.matchMedia) return;
+
+  const mq=window.matchMedia('(min-width:1000px) and (hover:hover) and (pointer:fine)');
+  const NS='http://www.w3.org/2000/svg';
+  const CH=6;                       /* 45° chamfer, same routing style as the hero */
+  const px=v=>Math.round(v)+0.5;    /* keep 1px lines crisp */
+  const wired=new WeakSet();
+  let svg=null,groupOf=new Map(),pending=0;
+
+  /* Layout position inside <main>, ignoring transforms (the reveal animation) */
+  function rel(el){
+    let x=0,y=0,e=el;
+    while(e&&e!==main){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent}
+    return{x,y,w:el.offsetWidth,h:el.offsetHeight};
+  }
+  function mk(tag,attrs){
+    const n=document.createElementNS(NS,tag);
+    for(const k in attrs) n.setAttribute(k,attrs[k]);
+    return n;
+  }
+
+  function teardown(){
+    if(svg){svg.remove();svg=null}
+    groupOf=new Map();
+    document.documentElement.classList.remove('nets-on');
+  }
+
+  function activate(el){
+    if(!svg) return;
+    const g=el?groupOf.get(el):null;
+    groupOf.forEach(gr=>gr.classList.toggle('on',gr===g));
+    svg.classList.toggle('has-active',!!g);
+  }
+
+  function wire(el){
+    if(wired.has(el)) return;
+    wired.add(el);
+    el.addEventListener('mouseenter',()=>activate(el));
+    el.addEventListener('mouseleave',()=>activate(null));
+    el.addEventListener('focusin',e=>{if(e.target.matches&&e.target.matches(':focus-visible')) activate(el)});
+    el.addEventListener('focusout',()=>activate(null));
+  }
+
+  function build(){
+    teardown();
+    if(!mq.matches) return;
+
+    const targets=[
+      ...[...document.querySelectorAll('#software .sw-row')].map(el=>({el,kind:'row'})),
+      ...[...document.querySelectorAll('#hardware .hw-card')].map(el=>({el,kind:'card'}))
+    ].filter(t=>t.el.offsetParent!==null);
+    if(!targets.length) return;
+
+    const L=rel(targets[0].el).x;   /* left edge of the content column */
+
+    targets.forEach(t=>{
+      const r=rel(t.el);
+      if(t.kind==='row'){
+        const ref=t.el.querySelector('.sw-ref')||t.el;
+        const a=rel(ref);
+        t.y=px(a.y+12);t.endX=px(L-6);t.seam=false;t.turnY=t.y;
+      }else{
+        const via=t.el.querySelector('.via')||t.el;
+        const a=rel(via);
+        t.y=px(a.y+a.h/2);t.endX=px(a.x+a.w/2);
+        t.seam=r.x>L+4;                 /* card sits in the right-hand column */
+        t.seamY=px(r.y-1);              /* the 1px channel above it */
+        t.turnY=t.seam?t.seamY:t.y;
+      }
+    });
+
+    /* Nets that turn off earliest take the lanes closest to the content,
+       so no trace ever has to cross another */
+    targets.sort((a,b)=>a.turnY-b.turnY);
+
+    const n=targets.length;
+    const x0=L-14;
+    const S=Math.max(2.5,Math.min(7,(x0-6)/Math.max(1,n-1)));
+    const y0=hero.offsetTop+hero.offsetHeight-14;
+
+    svg=mk('svg',{id:'nets','aria-hidden':'true',focusable:'false',
+      width:main.offsetWidth,height:main.offsetHeight,
+      viewBox:'0 0 '+main.offsetWidth+' '+main.offsetHeight});
+
+    targets.forEach((t,k)=>{
+      const x=px(x0-k*S);
+      let d='M'+x+','+y0;
+      if(t.seam){
+        d+=' V'+(t.seamY-CH)+' L'+(x+CH)+','+t.seamY+' H'+(t.endX-CH)+' L'+t.endX+','+(t.seamY+CH)+' V'+t.y;
+      }else{
+        d+=' V'+(t.y-CH)+' L'+(x+CH)+','+t.y+' H'+t.endX;
+      }
+      const g=mk('g',{class:'net'});
+      ['net-base','net-glow','net-lit','net-pulse'].forEach(c=>g.appendChild(mk('path',{class:c,d})));
+      g.appendChild(mk('rect',{class:'net-pad',x:x-2.5,y:y0-2.5,width:5,height:5}));
+      g.appendChild(mk('circle',{class:'net-end',cx:t.endX,cy:t.y,r:t.kind==='row'?2.5:2}));
+      svg.appendChild(g);
+      groupOf.set(t.el,g);
+      wire(t.el);
+    });
+
+    main.appendChild(svg);
+    document.documentElement.classList.add('nets-on');
+  }
+
+  function schedule(){
+    if(pending) return;
+    pending=requestAnimationFrame(()=>{pending=0;build()});
+  }
+
+  mq.addEventListener('change',schedule);
+  if('ResizeObserver' in window) new ResizeObserver(schedule).observe(main);
+  else window.addEventListener('resize',schedule,{passive:true});
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(schedule);
+  window.addEventListener('load',schedule);
+  schedule();
+})();
 
 /* ── Mobile menu ── */
 (function(){
