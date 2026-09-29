@@ -7,6 +7,7 @@
 <meta name="description" content="Kahaan Shah — Computer Science student building software, embedded systems, robotics, and data-driven systems. Ahmedabad University.">
 <meta name="author" content="Kahaan Shah">
 <meta name="theme-color" content="#08110d">
+<meta name="color-scheme" content="dark">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://kahaanshah.in/">
 <!-- Open Graph -->
@@ -36,6 +37,8 @@
   "name":"Kahaan Shah",
   "url":"https://kahaanshah.in",
   "jobTitle":"Computer Science Student",
+  "address":{"@type":"PostalAddress","addressLocality":"Ahmedabad","addressRegion":"Gujarat","addressCountry":"IN"},
+  "knowsAbout":["Embedded systems","Robotics","Control systems","PID control","Python","C++","Data pipelines","Next.js"],
   "affiliation":{"@type":"Organization","name":"Ahmedabad University"},
   "sameAs":["https://github.com/Kahaan83","https://www.linkedin.com/in/kahaan-shah-842095334"]
 }
@@ -178,7 +181,7 @@
   .mob-close:hover{color:var(--signal);border-color:var(--signal-dim)}
 
   .mob-label{
-    font-family:var(--mono);font-size:10px;font-weight:600;
+    font-family:var(--mono);font-size:11px;font-weight:600;
     letter-spacing:0.12em;color:var(--silk-faint);margin-bottom:12px;
   }
   .mob-rule{height:1px;background:var(--rule-lit);margin:8px 0 20px}
@@ -213,7 +216,7 @@
   .mob-dot{color:var(--signal)}
 
   .mob-ver{
-    font-family:var(--mono);font-size:10px;color:var(--silk-faint);
+    font-family:var(--mono);font-size:11px;color:var(--silk-faint);
     letter-spacing:0.08em;margin-top:32px;
   }
 
@@ -243,7 +246,7 @@
     will-change:transform;
   }
   #hero{
-    position:relative;min-height:100vh;
+    position:relative;min-height:100vh;min-height:100svh;
     display:flex;flex-direction:column;justify-content:space-between;
     padding:32px 40px 40px;overflow:hidden;background:var(--board-deep);
   }
@@ -369,7 +372,7 @@
   }
   .fact{padding:22px 18px 0 0}
   .fact dt{
-    font-family:var(--mono);font-size:10px;letter-spacing:0.08em;
+    font-family:var(--mono);font-size:11px;letter-spacing:0.08em;
     color:var(--silk-faint);margin-bottom:8px;
   }
   .fact dd{
@@ -378,7 +381,7 @@
   }
 
   /* ============ SOFTWARE ============ */
-  #software{background:var(--board);padding:0 0 110px}
+  #software{background:var(--board);padding:0 0 110px;scroll-margin-top:52px}
   .sw-list{border-top:1px solid var(--rule)}
 
   .sw-row{
@@ -426,8 +429,8 @@
 
   .sw-demo{
     display:inline-flex;align-items:center;gap:6px;
-    font-family:var(--mono);font-size:10px;font-weight:500;
-    letter-spacing:0.04em;color:var(--signal-dim);
+    font-family:var(--mono);font-size:11px;font-weight:500;
+    letter-spacing:0.04em;color:#2fae6a;
     text-decoration:none;transition:color .2s;
   }
   .sw-demo:hover{color:var(--signal)}
@@ -499,7 +502,7 @@
     letter-spacing:0.08em;color:var(--copper);
   }
   .hw-flag{
-    margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:500;
+    margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:500;
     letter-spacing:0.06em;padding:4px 9px;
     color:var(--signal);border:1px solid var(--signal-dim);
     background:rgba(61,220,132,0.07);
@@ -535,7 +538,7 @@
     font-family:var(--mono);font-size:12px;letter-spacing:0.1em;
     color:var(--silk-faint);display:block;
   }
-  .hw-placeholder-sub{font-size:10px!important;color:var(--copper-dim)!important;margin-top:6px}
+  .hw-placeholder-sub{font-size:11px!important;color:var(--copper-dim)!important;margin-top:6px}
   .hw-hero-fig img{
     width:100%;height:auto;max-height:420px;object-fit:contain;display:block;
   }
@@ -631,6 +634,17 @@
     border-top:1px solid var(--rule);padding-top:22px;
   }
 
+  /* ============ CARD LINKS (stretched, keyboard-accessible) ============ */
+  .stretch{color:inherit;text-decoration:none}
+  .stretch::after{content:'';position:absolute;inset:0;z-index:1}
+  .stretch:focus-visible{outline:none}
+  .sw-actions a,.hw-actions a{position:relative;z-index:2}
+  .sw-row:has(:focus-visible),.hw-card:has(:focus-visible){outline:2px solid var(--signal);outline-offset:-2px}
+  .sw-row:has(:focus-visible){padding-left:14px}
+  .sw-row:has(:focus-visible)::before{transform:scaleY(1)}
+  .sw-row:has(:focus-visible) .sw-ref,.sw-row:has(:focus-visible) .sw-open{color:var(--signal)}
+  .hw-card:has(:focus-visible){background:var(--mask-lit)}
+
   /* ============ REVEAL ============ */
   .rv{
     opacity:0;transform:translateY(22px);
@@ -679,6 +693,8 @@
     .ct-link{flex-direction:column;align-items:flex-start;gap:6px}
     .ct-what{width:auto}
     .hw-card.flagship{padding:28px 22px 24px}
+    .sw-row::before{left:-22px}
+    .sw-stack,.bom-row,.ct-what,.exp-when,.sw-open,.hw-action,.sw-demo,.foot-in,.fact dt,.desig{font-size:12px}
   }
   @media(max-width:420px){
     .facts{grid-template-columns:1fr}
@@ -686,6 +702,7 @@
     .hero-acts .act{text-align:center}
   }
 </style>
+<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
 
@@ -727,7 +744,7 @@
       <span class="mob-dot">·</span>
       <a href="https://www.linkedin.com/in/kahaan-shah-842095334" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       <span class="mob-dot">·</span>
-      <a href="mailto:kahaanshah83@gmail.com">Email</a>
+      <a href="#contact" data-m="a2FoYWFuc2hhaDgzQGdtYWlsLmNvbQ==">Email</a>
     </div>
     <div class="mob-ver">REV 3.0 · AHMEDABAD, IN</div>
   </div>
@@ -758,7 +775,7 @@
     <div class="hero-acts">
       <a href="#software" class="act solid">See the work</a>
       <a href="/Kahaan-Shah-Resume.pdf" class="act" target="_blank" rel="noopener noreferrer">View résumé</a>
-      <a href="mailto:kahaanshah83@gmail.com" class="act">Get in touch</a>
+      <a href="#contact" class="act" data-m="a2FoYWFuc2hhaDgzQGdtYWlsLmNvbQ==">Get in touch</a>
     </div>
     <div class="hero-meta">
       B.Tech CSE <span>· Ahmedabad University</span><br>
@@ -855,7 +872,7 @@
           I'm studying Computer Science and Engineering at Ahmedabad University. The work splits fairly cleanly in two: software and data on one side, embedded electronics on the other. I've kept both going deliberately, because the projects I find most interesting need both.
         </p>
         <p class="about-p">
-          This summer I've been a research intern at the Institute of Manufacturing &amp; Economy, working on sector-level analysis of India's electrical equipment industry — building the data pipeline as well as writing the analysis.
+          This past summer I was a research intern at the Institute of Manufacturing &amp; Economy, working on sector-level analysis of India's electrical equipment industry — building the data pipeline as well as writing the analysis.
         </p>
         <p class="about-p">
           I also handle digital operations for Padmavati Enterprise, my family's healthcare print business in Naranpura — which is where I learned that shipping something real is a different discipline from building it.
@@ -879,10 +896,10 @@
 
     <div class="sw-list">
 
-      <div class="sw-row rv" data-href="https://github.com/Kahaan83/ime-data-pipeline">
+      <div class="sw-row rv" >
         <div class="sw-ref">ime-pipeline</div>
         <div>
-          <h3 class="sw-name">Economic data pipeline, NIC 27</h3>
+          <h3 class="sw-name"><a class="stretch" href="https://github.com/Kahaan83/ime-data-pipeline" target="_blank" rel="noopener noreferrer">Economic data pipeline, NIC 27</a></h3>
           <div class="sw-stack">Python · pandas · LaTeX</div>
         </div>
         <p class="sw-desc">
@@ -893,10 +910,10 @@
         </div>
       </div>
 
-      <div class="sw-row rv" data-href="https://github.com/Kahaan83/digital-cards">
+      <div class="sw-row rv" >
         <div class="sw-ref">digital-cards</div>
         <div>
-          <h3 class="sw-name">NFC profile cards</h3>
+          <h3 class="sw-name"><a class="stretch" href="https://github.com/Kahaan83/digital-cards" target="_blank" rel="noopener noreferrer">NFC profile cards</a></h3>
           <div class="sw-stack">Next.js · Tailwind · NFC</div>
         </div>
         <p class="sw-desc">
@@ -908,10 +925,10 @@
         </div>
       </div>
 
-      <div class="sw-row rv" data-href="https://padmavati-website-green.vercel.app/">
+      <div class="sw-row rv" >
         <div class="sw-ref">padmavati-web</div>
         <div>
-          <h3 class="sw-name">Padmavati Enterprise</h3>
+          <h3 class="sw-name"><a class="stretch" href="https://padmavati-website-green.vercel.app/" target="_blank" rel="noopener noreferrer">Padmavati Enterprise</a></h3>
           <div class="sw-stack">Next.js 14 · Tailwind · Vercel</div>
         </div>
         <p class="sw-desc">
@@ -922,10 +939,10 @@
         </div>
       </div>
 
-      <div class="sw-row rv" data-href="https://escape-room-website-beta.vercel.app/">
+      <div class="sw-row rv" >
         <div class="sw-ref">escape-room</div>
         <div>
-          <h3 class="sw-name">Escape room, in the browser</h3>
+          <h3 class="sw-name"><a class="stretch" href="https://escape-room-website-beta.vercel.app/" target="_blank" rel="noopener noreferrer">Escape room, in the browser</a></h3>
           <div class="sw-stack">JavaScript · CSS · state machines</div>
         </div>
         <p class="sw-desc">
@@ -953,29 +970,23 @@
     <div class="hw-grid">
 
       <!-- ── FLAGSHIP: Self-balancing robot ── -->
-      <div class="hw-card wide flagship rv" data-href="https://github.com/Kahaan83/Self-Balancing-robot">
+      <div class="hw-card wide flagship rv" >
         <div class="hw-head">
           <span class="via" aria-hidden="true"></span>
           <span class="hw-ref">U1</span>
           <span class="hw-flag featured">Featured</span>
           <span class="hw-flag">First place</span>
         </div>
-        <h3 class="hw-name">Self-balancing robot</h3>
+        <h3 class="hw-name"><a class="stretch" href="https://github.com/Kahaan83/Self-Balancing-robot" target="_blank" rel="noopener noreferrer">Self-balancing robot</a></h3>
         <p class="hw-desc">
           A two-wheeled robot that holds itself upright using a PID loop reading a gyro and accelerometer. Won first place in the university competition. The controller was the easy half — getting the mechanical build stiff enough that the loop had something stable to correct against took most of the time, and taught me more than the code did.
         </p>
 
-        <!-- Project image placeholder — replace with actual photo -->
-        <figure class="hw-hero-fig" aria-label="Self-balancing robot project image">
-          <!-- REPLACE: uncomment <img> and remove placeholder div when image is ready -->
-          <!-- <img src="/images/self-balancing-robot.png" alt="Two-wheeled self-balancing robot with Arduino and IMU sensor" loading="lazy"> -->
-          <div class="hw-hero-placeholder" aria-hidden="true">
-            <div class="hw-placeholder-inner">
-              <span>[ U1 · PROJECT IMAGE ]</span>
-              <span class="hw-placeholder-sub">self-balancing-robot.png</span>
-            </div>
-          </div>
+        <!-- PROJECT IMAGE / 3D MODEL SLOT. Restore the block below once the image is ready:
+        <figure class="hw-hero-fig">
+          <img src="/images/self-balancing-robot.png" alt="Two-wheeled self-balancing robot with Arduino and IMU sensor" loading="lazy">
         </figure>
+        -->
 
         <dl class="bom">
           <div class="bom-row"><dt>CONTROL</dt><dd>PID loop, tuned on hardware</dd></div>
@@ -988,12 +999,12 @@
         </div>
       </div>
 
-      <div class="hw-card rv" data-href="https://github.com/Kahaan83/Biomechanical-throw-tracker">
+      <div class="hw-card rv" >
         <div class="hw-head">
           <span class="via" aria-hidden="true"></span>
           <span class="hw-ref">U2</span>
         </div>
-        <h3 class="hw-name">Biomechanical throw tracker</h3>
+        <h3 class="hw-name"><a class="stretch" href="https://github.com/Kahaan83/Biomechanical-throw-tracker" target="_blank" rel="noopener noreferrer">Biomechanical throw tracker</a></h3>
         <p class="hw-desc">
           A sensor glove that records what your arm actually does during an Ultimate Frisbee throw — orientation, rotation and muscle activation together. Built because I wanted the data and nothing off the shelf gave it to me.
         </p>
@@ -1009,12 +1020,12 @@
         </div>
       </div>
 
-      <div class="hw-card rv" data-href="https://github.com/Kahaan83/Line-follower">
+      <div class="hw-card rv" >
         <div class="hw-head">
           <span class="via" aria-hidden="true"></span>
           <span class="hw-ref">U3</span>
         </div>
-        <h3 class="hw-name">Line follower</h3>
+        <h3 class="hw-name"><a class="stretch" href="https://github.com/Kahaan83/Line-follower" target="_blank" rel="noopener noreferrer">Line follower</a></h3>
         <p class="hw-desc">
           The one that came first. An IR sensor array feeding real-time steering correction — simple enough to fully understand, which is exactly what made everything after it possible.
         </p>
@@ -1091,9 +1102,9 @@
         <span class="ct-what">Résumé</span>
         <span class="ct-val">Kahaan-Shah-Resume.pdf</span>
       </a>
-      <a class="ct-link" href="mailto:kahaanshah83@gmail.com">
+      <a class="ct-link" href="#contact" data-m="a2FoYWFuc2hhaDgzQGdtYWlsLmNvbQ==">
         <span class="ct-what">Email</span>
-        <span class="ct-val">kahaanshah83@gmail.com</span>
+        <span class="ct-val">Reveal email (needs JavaScript)</span>
       </a>
       <a class="ct-link" href="https://www.linkedin.com/in/kahaan-shah-842095334" target="_blank" rel="noopener noreferrer">
         <span class="ct-what">LinkedIn</span>
@@ -1163,7 +1174,9 @@ document.getElementById('footer-year').textContent=new Date().getFullYear();
       pts.push({x,y});
       if(x>W+GRID*3) break;
     }
-    return{pts,width:Math.random()<0.25?2:1,draw:0,speed:0.004+Math.random()*0.006,delay:Math.random()*1.2};
+    const segLens=[];let total=0;
+    for(let i=1;i<pts.length;i++){const L=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);segLens.push(L);total+=L}
+    return{pts,segLens,total,width:Math.random()<0.25?2:1,draw:0,speed:0.004+Math.random()*0.006,delay:Math.random()*1.2};
   }
 
   function build(){
@@ -1175,10 +1188,9 @@ document.getElementById('footer-year').textContent=new Date().getFullYear();
     for(let i=0;i<count;i++) routes.push(makeRoute());
   }
 
-  function polyPoint(pts,t){
-    let total=0;const segLens=[];
-    for(let i=1;i<pts.length;i++){const L=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);segLens.push(L);total+=L}
-    let d=t*total;
+  function polyPoint(r,t){
+    const pts=r.pts,segLens=r.segLens;
+    let d=t*r.total;
     for(let i=0;i<segLens.length;i++){
       if(d<=segLens[i]){const r=segLens[i]===0?0:d/segLens[i];return{x:pts[i].x+(pts[i+1].x-pts[i].x)*r,y:pts[i].y+(pts[i+1].y-pts[i].y)*r}}
       d-=segLens[i];
@@ -1187,9 +1199,8 @@ document.getElementById('footer-year').textContent=new Date().getFullYear();
   }
 
   function strokeRoute(r,upto){
-    const pts=r.pts;let total=0;const segLens=[];
-    for(let i=1;i<pts.length;i++){const L=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);segLens.push(L);total+=L}
-    let budget=upto*total;
+    const pts=r.pts,segLens=r.segLens;
+    let budget=upto*r.total;
     ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
     for(let i=0;i<segLens.length;i++){
       if(budget<=0) break;
@@ -1210,11 +1221,13 @@ document.getElementById('footer-year').textContent=new Date().getFullYear();
   }
 
   let t0=performance.now();
-  const pulseRate=W<768?0.002:0.006;
+  /* Signal-pulse spawn chance per finished trace per frame. Lower these to calm the hero. */
+  const PULSE_DESKTOP=0.006,PULSE_MOBILE=0.002;
 
   function frame(now){
     if(!animRunning) return;
     const dt=(now-t0)/16.67;t0=now;
+    const pulseRate=W<768?PULSE_MOBILE:PULSE_DESKTOP;
     ctx.clearRect(0,0,W,H);
 
     routes.forEach(r=>{
@@ -1232,7 +1245,7 @@ document.getElementById('footer-year').textContent=new Date().getFullYear();
     for(let i=pulses.length-1;i>=0;i--){
       const p=pulses[i];p.t+=p.v*dt;
       if(p.t>=1){pulses.splice(i,1);continue}
-      const pt=polyPoint(p.r.pts,p.t);
+      const pt=polyPoint(p.r,p.t);
       const fade=Math.sin(p.t*Math.PI);
       ctx.beginPath();ctx.arc(pt.x,pt.y,2.6,0,Math.PI*2);
       ctx.fillStyle='rgba(61,220,132,'+(0.9*fade).toFixed(3)+')';ctx.fill();
@@ -1280,7 +1293,12 @@ document.getElementById('footer-year').textContent=new Date().getFullYear();
     else{sizeUp();startAnim()}
   });
 
-  let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{
+  let rt,lastW=W,lastH=H;
+  window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{
+    const w=cv.clientWidth,h=cv.clientHeight;
+    /* Mobile URL-bar show/hide only nudges the height: don't regenerate the traces for that. */
+    if(w===lastW&&Math.abs(h-lastH)<160) return;
+    lastW=w;lastH=h;
     sizeUp();
     if(reduce) drawStatic(); else startAnim();
   },180)},{passive:true});
@@ -1294,6 +1312,10 @@ document.getElementById('footer-year').textContent=new Date().getFullYear();
 
   window.addEventListener('scroll',()=>{
     nav.classList.toggle('scrolled',window.scrollY>40);
+    /* The contact section is short, so highlight it once the page bottom is reached */
+    if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-4){
+      links.forEach(l=>l.classList.toggle('active',l.dataset.section==='contact'));
+    }
   },{passive:true});
 
   const secEls=sections.map(id=>document.getElementById(id)).filter(Boolean);
@@ -1386,13 +1408,34 @@ document.querySelectorAll('.rv').forEach((el,i)=>{
   io.observe(el);
 });
 
-/* ── Row / card click-through ── */
-document.querySelectorAll('[data-href]').forEach(el=>{
-  el.addEventListener('click',e=>{
-    if(e.target.closest('a,button')) return;
-    const href=el.getAttribute('data-href');
-    if(href) window.open(href,'_blank','noopener,noreferrer');
-  });
+/* ── Marquee: repeat the set until half the track is wider than any screen ── */
+(function(){
+  const track=document.getElementById('marquee-track');
+  if(!track) return;
+  function fill(){
+    const items=[...track.children];
+    const half=items.length/2;
+    const base=items.slice(0,half);
+    items.slice(half).forEach(n=>n.remove());
+    const baseW=track.scrollWidth;
+    if(!baseW) return;
+    const k=Math.max(1,Math.ceil(Math.max(window.innerWidth,screen.width)/baseW));
+    const frag=document.createDocumentFragment();
+    for(let i=1;i<k*2;i++) base.forEach(n=>frag.appendChild(n.cloneNode(true)));
+    track.appendChild(frag);
+    track.style.animationDuration=(28*k)+'s';
+  }
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fill); else fill();
+})();
+
+/* ── Email: assembled at runtime so it isn't sitting in the HTML for scrapers ── */
+document.querySelectorAll('[data-m]').forEach(a=>{
+  try{
+    const m=atob(a.dataset.m);
+    a.href='mailto:'+m;
+    const v=a.querySelector('.ct-val');
+    if(v) v.textContent=m;
+  }catch(e){}
 });
 
 /* ── Mobile menu ── */
@@ -1405,12 +1448,15 @@ document.querySelectorAll('[data-href]').forEach(el=>{
   const links=menu.querySelectorAll('.mob-link');
   const reduceQ=window.matchMedia('(prefers-reduced-motion:reduce)');
   let savedFocus=null;
+  const bgEls=[document.getElementById('site-nav'),document.getElementById('main'),document.querySelector('footer')].filter(Boolean);
+  function setInert(v){bgEls.forEach(el=>{el.inert=v})}
 
   function openMenu(){
     savedFocus=document.activeElement;
     menu.removeAttribute('hidden');
     toggle.setAttribute('aria-expanded','true');
     document.documentElement.style.overflow='hidden';
+    setInert(true);
 
     /* Stagger link animation delays */
     if(!reduceQ.matches){
@@ -1429,6 +1475,7 @@ document.querySelectorAll('[data-href]').forEach(el=>{
     menu.classList.remove('is-open');
     toggle.setAttribute('aria-expanded','false');
     document.documentElement.style.overflow='';
+    setInert(false);
     links.forEach(l=>{l.style.transitionDelay=''});
 
     function onDone(){
