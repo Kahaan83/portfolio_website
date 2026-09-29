@@ -1545,8 +1545,10 @@ document.querySelectorAll('[data-m]').forEach(a=>{
     targets.sort((a,b)=>a.turnY-b.turnY);
 
     const n=targets.length;
-    const x0=L-14;
-    const S=Math.max(2.5,Math.min(7,(x0-6)/Math.max(1,n-1)));
+    /* Hug the left edge of the page; only squeeze together when the margin is narrow */
+    const LEFT=16,WANT=7;
+    let x0=LEFT+(n-1)*WANT,S=WANT;
+    if(x0>L-14){x0=L-14;S=Math.max(2.5,Math.min(WANT,(x0-6)/Math.max(1,n-1)))}
     const y0=hero.offsetTop+hero.offsetHeight-14;
 
     svg=mk('svg',{id:'nets','aria-hidden':'true',focusable:'false',
