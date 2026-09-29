@@ -668,6 +668,11 @@
     .net-base,.net-glow,.net-lit,.net-pad,.net-end{transition:none}
   }
 
+  /* Desktop with a mouse: anchor the content column beside the trace bus instead of centering it */
+  @media (min-width:1000px) and (hover:hover) and (pointer:fine){
+    .wrap{max-width:1400px;margin-left:60px;margin-right:auto}
+  }
+
   /* ============ REVEAL ============ */
   .rv{
     opacity:0;transform:translateY(22px);
