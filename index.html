@@ -569,6 +569,53 @@
   .hw-action:hover{color:var(--signal)}
   .hw-card:hover .hw-action{color:var(--signal)}
 
+
+  /* ============ WIREFRAME MODELS (interactive canvas figures inside hardware cards) ============ */
+  .wf{
+    position:relative;z-index:2;           /* above the card's stretched link so the canvas gets the pointer */
+    width:100%;aspect-ratio:4/3;min-height:340px;margin:0 0 26px;overflow:hidden;container-type:inline-size;
+    color:var(--silk);font:400 12px/1.4 var(--mono);
+    border:1px solid var(--rule-lit);
+    background:
+      repeating-linear-gradient(90deg,rgba(196,131,74,.04) 0 1px,transparent 1px 44px),
+      repeating-linear-gradient(0deg,rgba(196,131,74,.04) 0 1px,transparent 1px 44px),
+      var(--board);
+  }
+  .hw-card.wide .wf{aspect-ratio:16/8;min-height:400px}
+  .wf canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
+  .wf canvas.drag{cursor:grabbing}
+  .wf canvas:focus-visible{outline:2px solid var(--signal);outline-offset:-2px}
+  .wf-cap{position:absolute;left:16px;top:14px;pointer-events:none;color:var(--silk-mute)}
+  .wf-cap b{display:block;color:var(--silk);font-weight:500;font-size:13px}
+  .wf-bar{position:absolute;left:12px;right:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .wf-bar button{font:inherit;color:var(--silk-mute);background:rgba(5,11,8,.72);border:1px solid var(--rule-lit);padding:6px 10px;cursor:pointer;transition:color .2s,border-color .2s}
+  .wf-bar button:hover{color:var(--silk)}
+  .wf-bar button[aria-pressed=true]{color:var(--signal);border-color:var(--signal-dim)}
+  .wf-bar button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+  .wf-sep{width:1px;height:18px;background:var(--rule-lit);margin:0 4px}
+  .wf-hint{margin-left:auto;color:var(--silk-mute)}
+  .wf-hint.t{display:none}
+  @media (hover:none){.wf-hint.m{display:none}.wf-hint.t{display:inline}}
+  @container (max-width:680px){.wf-hint{display:none!important}}
+  @container (max-width:420px){.wf-sep{display:none}}
+  .wf noscript{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--silk-faint);letter-spacing:.06em}
+  /* the canvas has its own focus ring, so don't outline the whole card as well */
+  .hw-card:has(.wf :focus-visible){outline:none;background:var(--mask)}
+  .hw-card:has(.wf :focus-visible):hover{background:var(--mask-lit)}
+
+  /* Empty slot reserved for the line follower model. Same box as .wf so U2 and U3 line up. */
+  .wf-slot{
+    position:relative;z-index:2;width:100%;aspect-ratio:4/3;min-height:340px;margin:0 0 26px;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    border:1px dashed var(--rule-lit);
+    background:
+      repeating-linear-gradient(90deg,rgba(196,131,74,.025) 0 1px,transparent 1px 44px),
+      repeating-linear-gradient(0deg,rgba(196,131,74,.025) 0 1px,transparent 1px 44px),
+      var(--board-deep);
+  }
+  .wf-slot span{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--silk-faint)}
+  .wf-slot .sub{font-size:11px;color:var(--copper-dim);margin-top:6px}
+
   /* ============ EXPERIENCE ============ */
   #experience{background:var(--board);padding:110px 0}
   .exp-list{margin-top:48px;border-top:1px solid var(--rule)}
@@ -721,6 +768,8 @@
     .ct-link{flex-direction:column;align-items:flex-start;gap:6px}
     .ct-what{width:auto}
     .hw-card.flagship{padding:28px 22px 24px}
+    .wf,.hw-card.wide .wf,.wf-slot{aspect-ratio:auto;height:420px;min-height:0}
+    .wf-bar button{padding:6px 8px}
     .sw-row::before{left:-22px}
     .sw-stack,.bom-row,.ct-what,.exp-when,.sw-open,.hw-action,.sw-demo,.foot-in,.fact dt,.desig{font-size:12px}
   }
@@ -1010,11 +1059,20 @@
           A two-wheeled robot that holds itself upright using a PID loop reading a gyro and accelerometer. Won first place in the university competition. The controller was the easy half — getting the mechanical build stiff enough that the loop had something stable to correct against took most of the time, and taught me more than the code did.
         </p>
 
-        <!-- PROJECT IMAGE / 3D MODEL SLOT. Restore the block below once the image is ready:
-        <figure class="hw-hero-fig">
-          <img src="/images/self-balancing-robot.png" alt="Two-wheeled self-balancing robot with Arduino and IMU sensor" loading="lazy">
+        <!-- 3D MODEL: self-balancing robot (canvas, no iframe; script is in the page footer) -->
+        <figure class="wf" id="wf-robot">
+          <canvas id="rb-cv" tabindex="0" role="img" aria-label="Interactive wireframe 3D model of the two-wheeled self-balancing robot with an LCD on its front panel. Drag or use the arrow keys to rotate, plus and minus to zoom."></canvas>
+          <div class="wf-cap"><b>Wireframe model</b>proportions traced from a photo</div>
+          <div class="wf-bar" role="group" aria-label="Robot model controls">
+            <button type="button" data-v="iso">3/4</button><button type="button" data-v="front">front</button><button type="button" data-v="side">side</button><button type="button" data-v="top">top</button>
+            <span class="wf-sep" aria-hidden="true"></span>
+            <button type="button" id="rb-auto" aria-pressed="true">auto-rotate</button>
+            <button type="button" id="rb-spin" aria-pressed="false">spin wheels</button>
+            <button type="button" id="rb-lab" aria-pressed="true">labels</button>
+            <span class="wf-hint m">drag to rotate · ctrl + scroll to zoom</span><span class="wf-hint t">swipe sideways to rotate</span>
+          </div>
+          <noscript>3D model needs JavaScript</noscript>
         </figure>
-        -->
 
         <dl class="bom">
           <div class="bom-row"><dt>CONTROL</dt><dd>PID loop, tuned on hardware</dd></div>
@@ -1036,6 +1094,21 @@
         <p class="hw-desc">
           A sensor glove that records what your arm actually does during an Ultimate Frisbee throw — orientation, rotation and muscle activation together. Built because I wanted the data and nothing off the shelf gave it to me.
         </p>
+        <!-- 3D MODEL: sensor glove -->
+        <figure class="wf" id="wf-glove">
+          <canvas id="gl-cv" tabindex="0" role="img" aria-label="Interactive wireframe 3D model of the sensor glove: a microcontroller, IMU, ADC, EMG front end, battery and antenna on the back of the hand, a force sensor on the thumb, and two electrode pads on the forearm. Drag or use the arrow keys to rotate, plus and minus to zoom."></canvas>
+          <div class="wf-cap"><b>Wireframe model</b>traced from photos of the glove</div>
+          <div class="wf-bar" role="group" aria-label="Glove model controls">
+            <button type="button" data-v="iso">3/4</button><button type="button" data-v="side">side</button><button type="button" data-v="top">top</button><button type="button" data-v="palm">palm</button>
+            <span class="wf-sep" aria-hidden="true"></span>
+            <button type="button" id="gl-auto" aria-pressed="true">auto-rotate</button>
+            <button type="button" id="gl-flow" aria-pressed="false">data flow</button>
+            <button type="button" id="gl-lab" aria-pressed="true">labels</button>
+            <span class="wf-hint m">drag to rotate · ctrl + scroll to zoom</span><span class="wf-hint t">swipe sideways to rotate</span>
+          </div>
+          <noscript>3D model needs JavaScript</noscript>
+        </figure>
+
         <dl class="bom">
           <div class="bom-row"><dt>MCU</dt><dd>ESP32</dd></div>
           <div class="bom-row"><dt>IMU</dt><dd>BNO085, 9-axis fusion</dd></div>
@@ -1057,6 +1130,15 @@
         <p class="hw-desc">
           The one that came first. An IR sensor array feeding real-time steering correction — simple enough to fully understand, which is exactly what made everything after it possible.
         </p>
+        <!-- LINE FOLLOWER MODEL SLOT.
+             Same box as the glove figure so the two cards stay aligned.
+             When the wireframe is ready: replace this <div> with a <figure class="wf" id="wf-line">
+             (copy the glove block above), and add its script next to the other two at the bottom of the page.
+             To hide the slot until then, delete this block or add the `hidden` attribute. -->
+        <div class="wf-slot" role="img" aria-label="Space reserved for a 3D model of the line follower">
+          <div><span>LINE FOLLOWER · 3D MODEL</span><span class="sub">wireframe in progress</span></div>
+        </div>
+
         <dl class="bom">
           <div class="bom-row"><dt>SENSING</dt><dd>IR reflectance array</dd></div>
           <div class="bom-row"><dt>DRIVE</dt><dd>H-bridge motor driver</dd></div>
@@ -1667,6 +1749,378 @@ document.querySelectorAll('[data-m]').forEach(a=>{
   menu.addEventListener('click',e=>{
     if(e.target===menu) closeMenu();
   });
+})();
+
+/* ── Wireframe model: self-balancing robot ── */
+(()=>{
+const cv=document.getElementById('rb-cv'),ctx=cv.getContext('2d');
+const TAU=Math.PI*2, reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const C={body:'#3ddc84',plate:'#1f8a52',bezel:'#e9efea',cells:'#3ddc84',motor:'#e9efea',tire:'#8ea497',rim:'#c4834a',strip:'#e8964f'};
+
+/* ── Geometry ── 1 unit ≈ 1/100 of the photo's width. x = right, y = up, z = toward the LCD side.
+   Half-depths below can't be seen in the photo, so they're estimates: tweak to taste. */
+const HD=1.8;   /* upper MDF housing, half depth */
+const CD=1.6;   /* lower chassis, half depth */
+
+const add=(L,a,b,c,al=1)=>L.push([a,b,c,al]);
+const poly=(L,p,c,al)=>p.forEach((v,i)=>add(L,v,p[(i+1)%p.length],c,al));
+const rectXY=(L,z,x0,x1,y0,y1,c,al)=>poly(L,[[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]],c,al);
+const rectYZ=(L,x,y0,y1,z0,z1,c,al)=>poly(L,[[x,y0,z0],[x,y1,z0],[x,y1,z1],[x,y0,z1]],c,al);
+const rectXZ=(L,y,x0,x1,z0,z1,c,al)=>poly(L,[[x0,y,z0],[x1,y,z0],[x1,y,z1],[x0,y,z1]],c,al);
+const box=(L,x0,x1,y0,y1,z0,z1,c,al)=>{rectXY(L,z0,x0,x1,y0,y1,c,al);rectXY(L,z1,x0,x1,y0,y1,c,al);
+  [[x0,y0],[x1,y0],[x1,y1],[x0,y1]].forEach(([x,y])=>add(L,[x,y,z0],[x,y,z1],c,al))};
+
+const ST=[], GR=[];
+/* upper housing: chamfered MDF box */
+const HW=3.17,HB=4.3,HT=7.2,CH=.6;
+const prof=[[-HW+CH,HT],[HW-CH,HT],[HW,HT-CH],[HW,HB+CH],[HW-CH,HB],[-HW+CH,HB],[-HW,HB+CH],[-HW,HT-CH]];
+prof.forEach((p,i)=>{const q=prof[(i+1)%8];
+  add(ST,[p[0],p[1],HD],[q[0],q[1],HD],C.body);
+  add(ST,[p[0],p[1],-HD],[q[0],q[1],-HD],C.body);
+  add(ST,[p[0],p[1],HD],[p[0],p[1],-HD],C.body)});
+/* lower chassis: side plates, front/back panels, shelf */
+const CW=2.5,CT=4.3,CB=.75,SH=2.15;
+[-CW,CW].forEach(x=>rectYZ(ST,x,CB,CT,-CD,CD,C.plate));
+[CD,-CD].forEach(z=>rectXY(ST,z,-CW,CW,SH,CT,C.plate));
+rectXZ(ST,SH,-CW,CW,-CD,CD,C.plate,.7);
+/* orange trim band with hatch */
+rectXY(ST,CD+.02,-CW,CW,2.4,2.85,C.strip);
+for(let x=-CW;x<CW-.44;x+=.5)add(ST,[x,2.4,CD+.02],[x+.45,2.85,CD+.02],C.strip,.6);
+/* 16x2 LCD */
+box(ST,-1.2,1.2,5.3,6.1,HD,HD+.1,C.bezel);
+const LZ=HD+.1;
+rectXY(ST,LZ,-1,1,5.42,5.98,C.cells);
+for(let i=1;i<16;i++){const x=-1+i*.125;add(ST,[x,5.42,LZ],[x,5.98,LZ],C.cells,.45)}
+add(ST,[-1,5.7,LZ],[1,5.7,LZ],C.cells,.45);
+/* gear motors + axles */
+[-1,1].forEach(s=>{
+  box(ST,s>0?1:-2.2,s>0?2.2:-1,1.3,2.05,-.6,.6,C.motor);
+  rectYZ(ST,s*1.5,1.3,2.05,-.6,.6,C.motor,.5);
+  add(ST,[s*2.2,1.8,0],[s*3.55,1.8,0],C.rim)});
+/* ground grid */
+for(let i=-8;i<=8;i++){add(GR,[i,0,-8],[i,0,8],C.rim,.16);add(GR,[-8,0,i],[8,0,i],C.rim,.16)}
+
+/* wheels are rebuilt each frame so the tread can spin */
+function wheel(L,s,spin){
+  const cx=3.25*s,cy=1.8,R=1.8,hw=.72,xo=cx+s*hw,xi=cx-s*hw,xr=xo-s*.1;
+  const P=(x,r,a)=>[x,cy+r*Math.cos(a),r*Math.sin(a)];
+  const ring=(x,r,c,al)=>{for(let i=0;i<36;i++)add(L,P(x,r,i/36*TAU),P(x,r,(i+1)/36*TAU),c,al)};
+  ring(xo,R,C.tire);ring(xi,R,C.tire,.7);ring(xo,1.45,C.tire,.5);
+  ring(xr,1.25,C.rim);ring(xr,.35,C.rim);
+  for(let k=0;k<24;k++){const t=k/24*TAU+spin;
+    add(L,P(xi,R,t),P(cx,R,t+.14*s),C.tire,.8);add(L,P(cx,R,t+.14*s),P(xo,R,t),C.tire,.8)}
+  for(let k=0;k<5;k++){const t=k/5*TAU+spin;add(L,P(xr,.35,t),P(xr,1.25,t),C.rim)}
+}
+
+const LB=[['16×2 lcd',[1.2,5.7,LZ]],['mdf housing',[HW,6.7,0]],['orange trim',[CW,2.62,CD]],
+          ['gear motor',[2.2,1.7,0]],['wheel, herringbone tread',[3.25,3.6,0]],['chassis side plate',[-CW,3.2,0]]];
+
+/* ── State ── */
+let W=0,H=0,yaw=-.65,pitch=.28,zoom=1,vy=0,spin=0,auto=!reduce,spinOn=false,labels=true;
+let drag=null,tween=null,resume=0,lastMove=0,lastKey='',raf=0,vis=true,last=performance.now();
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+function size(){const d=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;
+  cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);lastKey=''}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  const u=Math.min(W/10.5,H/8.8)*zoom,DIST=28;
+  const pr=p=>{const y=p[1]-3.4,z=p[2],x1=p[0]*cy+z*sy,z1=-p[0]*sy+z*cy,y2=y*cp-z1*sp,z2=y*sp+z1*cp,k=u*DIST/(DIST-z2);
+    return[W/2+x1*k,H*.46-y2*k,z2]};
+  const fade=z=>.4+.6*clamp((z+5)/10,0,1);
+  ctx.lineWidth=1.2;ctx.lineCap='round';
+  const dl=L=>{for(const s of L){const a=pr(s[0]),b=pr(s[1]);
+    ctx.globalAlpha=s[3]*fade((a[2]+b[2])/2);ctx.strokeStyle=s[2];
+    ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}};
+  dl(GR);dl(ST);
+  const WL=[];wheel(WL,-1,-spin);wheel(WL,1,spin);dl(WL);
+  if(labels){
+    ctx.font='11px "IBM Plex Mono",ui-monospace,monospace';ctx.textBaseline='middle';
+    for(const [t,p] of LB){
+      const a=pr(p),w=ctx.measureText(t).width;let right=a[0]>=W/2;
+      if(right&&a[0]+30+w>W-8)right=false;else if(!right&&a[0]-30-w<8)right=true;
+      const x2=a[0]+(right?22:-22);
+      ctx.globalAlpha=fade(a[2]);
+      ctx.strokeStyle='rgba(233,239,234,.5)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(x2,a[1]);ctx.stroke();
+      ctx.fillStyle='#3ddc84';ctx.beginPath();ctx.arc(a[0],a[1],2.5,0,TAU);ctx.fill();
+      ctx.fillStyle='#e9efea';ctx.textAlign=right?'left':'right';
+      ctx.fillText(t,x2+(right?5:-5),a[1]);
+    }
+  }
+  ctx.globalAlpha=1;
+}
+
+function tick(t){
+  raf=requestAnimationFrame(tick);
+  if(!vis){cancelAnimationFrame(raf);raf=0;return}
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(tween){
+    yaw+=(tween.y-yaw)*.14;pitch+=(tween.p-pitch)*.14;zoom+=(tween.z-zoom)*.14;
+    if(Math.abs(tween.y-yaw)+Math.abs(tween.p-pitch)+Math.abs(tween.z-zoom)<.003){yaw=tween.y;pitch=tween.p;zoom=tween.z;tween=null}
+  }else if(!drag){
+    if(Math.abs(vy)>.0004){yaw+=vy;vy*=.92}
+    else if(auto&&t>resume)yaw+=dt*.35;
+  }
+  if(spinOn)spin+=dt*2.2;
+  const key=[yaw,pitch,zoom,spin,W,H,labels].join();
+  if(key!==lastKey){lastKey=key;draw()}
+}
+
+/* ── Input ── */
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};vy=0;tween=null;cv.setPointerCapture(e.pointerId);cv.classList.add('drag')});
+cv.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+  yaw+=dx*.008;vy=dx*.008;lastMove=performance.now();
+  if(e.pointerType==='mouse')pitch=clamp(pitch+dy*.006,-.35,1.5);
+});
+const end=()=>{if(!drag)return;drag=null;cv.classList.remove('drag');
+  if(performance.now()-lastMove>60)vy=0;resume=performance.now()+2500};
+cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+cv.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();tween=null;
+  zoom=clamp(zoom*Math.exp(-e.deltaY*.01),.6,2.5)},{passive:false});
+cv.addEventListener('keydown',e=>{
+  const k=e.key;let h=1;
+  if(k==='ArrowLeft')yaw-=.12;else if(k==='ArrowRight')yaw+=.12;
+  else if(k==='ArrowUp')pitch=Math.min(1.5,pitch+.08);else if(k==='ArrowDown')pitch=Math.max(-.35,pitch-.08);
+  else if(k==='+'||k==='=')zoom=Math.min(2.5,zoom*1.1);else if(k==='-')zoom=Math.max(.6,zoom/1.1);else h=0;
+  if(h){e.preventDefault();tween=null;resume=performance.now()+2500}
+});
+
+const VIEWS={iso:[-.65,.28,1],front:[0,.04,1],side:[Math.PI/2,.04,1],top:[0,1.5,1]};
+const bAuto=document.getElementById('rb-auto');
+function setAuto(v){auto=v;bAuto.setAttribute('aria-pressed',v)}
+document.querySelectorAll('#wf-robot [data-v]').forEach(b=>b.addEventListener('click',()=>{
+  const [y,p,z]=VIEWS[b.dataset.v],d=((y-yaw+Math.PI)%TAU+TAU)%TAU-Math.PI;
+  tween={y:yaw+d,p,z};vy=0;setAuto(false)}));
+cv.addEventListener('dblclick',()=>{const [y,p,z]=VIEWS.iso;tween={y:yaw+((y-yaw+Math.PI)%TAU+TAU)%TAU-Math.PI,p,z}});
+const tog=(id,set)=>{const b=document.getElementById(id);
+  b.addEventListener('click',()=>{const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);set(v)})};
+tog('rb-auto',v=>{auto=v;resume=0});
+tog('rb-spin',v=>spinOn=v);
+tog('rb-lab',v=>labels=v);
+if(reduce)bAuto.setAttribute('aria-pressed','false');
+
+/* ── Boot ── */
+new ResizeObserver(size).observe(cv);
+new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(vis&&!raf){last=performance.now();raf=requestAnimationFrame(tick)}}).observe(cv);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>lastKey='');
+const lb=document.getElementById('rb-lab');if(cv.clientWidth<560){labels=false;lb.setAttribute('aria-pressed','false')}
+size();raf=requestAnimationFrame(tick);
+})();
+
+/* ── Wireframe model: sensor glove ── */
+(()=>{
+const cv=document.getElementById('gl-cv'),ctx=cv.getContext('2d');
+const TAU=Math.PI*2, reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const C={glove:'#1f8a52',mute:'#7d8c83',silk:'#e9efea',sig:'#3ddc84',cop:'#c4834a',org:'#e8964f',red:'#e26d5c',yel:'#e8c14f'};
+
+/* ── Geometry ── 1 unit ≈ 1 cm. Right hand, palm down: fingers point -x, thumb toward +z,
+   wrist and forearm run toward +x, y is up (back of hand). Sizes are estimates from the photos. */
+const add=(L,a,b,c,al=1)=>L.push([a,b,c,al]);
+const poly=(L,p,c,al)=>p.forEach((v,i)=>add(L,v,p[(i+1)%p.length],c,al));
+const rectXZ=(L,y,x0,x1,z0,z1,c,al)=>poly(L,[[x0,y,z0],[x1,y,z0],[x1,y,z1],[x0,y,z1]],c,al);
+const box=(L,x0,x1,y0,y1,z0,z1,c,al)=>{
+  const t=[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
+  poly(L,t.map(([x,z])=>[x,y0,z]),c,al);poly(L,t.map(([x,z])=>[x,y1,z]),c,al);
+  t.forEach(([x,z])=>add(L,[x,y0,z],[x,y1,z],c,al))};
+function frustum(L,xa,ha,wa,xb,hb,wb,c,al){
+  const r=(x,h,w)=>[[x,-h,-w],[x,h,-w],[x,h,w],[x,-h,w]],A=r(xa,ha,wa),B=r(xb,hb,wb);
+  poly(L,A,c,al);poly(L,B,c,al);A.forEach((p,i)=>add(L,p,B[i],c,al))}
+function limb(L,b,d,pp,len,hw,hh,tp,rings,c,al){   /* finger/thumb: tapered box with joint rings */
+  const R=rings.map(t=>{const s=1-(1-tp)*t,cx=b[0]+d[0]*len*t,cz=b[2]+d[2]*len*t;
+    return[[-1,-1],[1,-1],[1,1],[-1,1]].map(([u,v])=>[cx+pp[0]*hw*s*u,b[1]+hh*s*v,cz+pp[2]*hw*s*u])});
+  R.forEach((r,i)=>{poly(L,r,c,al);if(i)r.forEach((p,k)=>add(L,R[i-1][k],p,c,al))})}
+function wire(L,a,b,lift,c,al=.9,n=10){          /* sagging jumper */
+  const p=[];for(let i=0;i<=n;i++){const t=i/n;
+    p.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t+lift*Math.sin(Math.PI*t),a[2]+(b[2]-a[2])*t])}
+  for(let i=0;i<n;i++)add(L,p[i],p[i+1],c,al);return p}
+
+const ST=[],GR=[],PW=[];                          /* PW = sensor wires that carry the data-flow pulses */
+const yt=x=>.8+.8*x/9;                            /* height of the back of the hand at x */
+
+/* hand: palm, four fingers, thumb */
+frustum(ST,0,.8,4.2,9,1.6,3.1,C.glove,.9);
+[[3.15,7.4],[1.05,8],[-1.05,7.4],[-3.15,5.8]].forEach(([z,l])=>
+  limb(ST,[0,0,z],[-1,0,0],[0,0,1],l,.95,.75,.82,[0,.36,.68,1],C.glove,.9));
+limb(ST,[7.4,0,3],[-.75,0,.66],[.66,0,.75],6.4,1.15,.85,.8,[0,.33,.66,1],C.glove,.9);
+
+/* knit cuff + forearm (superellipse cross-section) */
+const sg=v=>Math.sign(v)*Math.pow(Math.abs(v),2/2.6);
+const bp=(x,th,k=1)=>{const f=Math.max(0,x-14);return[x,(1.6+.09*f)*k*sg(Math.sin(th)),(3.1+.06*f)*k*sg(Math.cos(th))]};
+const ringAt=(x,k)=>Array.from({length:16},(_,i)=>bp(x,i/16*TAU,k));
+poly(ST,ringAt(9),C.glove,.9);poly(ST,ringAt(11.5),C.glove,.6);
+poly(ST,ringAt(13.6),C.cop,.9);poly(ST,ringAt(14),C.cop,.9);
+[17,20,23].forEach(x=>poly(ST,ringAt(x),C.mute,.35));
+for(let i=0;i<16;i+=2){const th=i/16*TAU,xs=[9,14,17,20,23];
+  for(let j=0;j<4;j++)add(ST,bp(xs[j],th),bp(xs[j+1],th),j?C.mute:C.glove,j?.35:.6)}
+
+/* BNO085 IMU, back of hand near the knuckles */
+{const y0=yt(2.6)+.02;
+ box(ST,1.6,3.6,y0,y0+.35,-.5,1.5,C.silk);
+ rectXZ(ST,y0+.35,2,3,0,1,C.silk,.6);
+ box(ST,3.6,4.1,y0,y0+.3,.2,.9,C.silk,.7)}
+/* 2.4 GHz antenna strip, slightly skewed */
+{const cx=4.6,cz=2.2,l=3.6,w=1.3,a=.25,y0=yt(4.6)+.02,cs=Math.cos(a),sn=Math.sin(a);
+ const P=(u,v,y)=>[cx+u*cs-v*sn,y,cz+u*sn+v*cs],t=[[-l/2,-w/2],[l/2,-w/2],[l/2,w/2],[-l/2,w/2]];
+ poly(ST,t.map(([u,v])=>P(u,v,y0+.08)),C.mute);poly(ST,t.map(([u,v])=>P(u,v,y0)),C.mute,.6);
+ t.forEach(([u,v])=>add(ST,P(u,v,y0),P(u,v,y0+.08),C.mute,.6));
+ add(ST,P(-l/2+.3,0,y0+.08),P(l/2-.3,0,y0+.08),C.mute,.7)}
+/* ADS1115 on a foam pad */
+{const y0=yt(6),y1=y0+.5;
+ box(ST,4.6,7.7,y0,y1,-2.9,-.5,C.mute,.7);
+ box(ST,4.9,7.4,y1,y1+.25,-2.6,-.8,C.sig);
+ rectXZ(ST,y1+.25,5.6,6.6,-2,-1.4,C.sig,.6);
+ for(let i=0;i<5;i++)add(ST,[5.1+i*.5,y1+.25,-2.5],[5.1+i*.5,y1+.25,-2.15],C.sig,.6)}
+/* LiPo battery */
+{const y0=yt(7.8)+.02;box(ST,6.4,9.2,y0,y0+.65,.6,3.3,C.org);add(ST,[7,y0+.65,.6],[7,y0+.65,3.3],C.org,.5)}
+/* XIAO ESP32-C3 */
+{const y0=1.66;box(ST,10,12.1,y0,y0+.2,-2.1,-.3,C.silk);rectXZ(ST,y0+.2,10.5,11.6,-1.8,-.7,C.silk,.6);box(ST,10.6,11.5,y0,y0+.3,-2.35,-2.1,C.silk,.7)}
+/* AD8232 board, 3.5 mm jack, power switch */
+{const y0=1.66;box(ST,10.3,13.1,y0,y0+.12,.2,3,C.red);rectXZ(ST,y0+.12,11,12,.7,1.7,C.red,.6);box(ST,11,12,y0,y0+.55,3,3.75,C.silk,.8);
+ box(ST,13.1,14.4,y0,2.6,1.3,2.7,C.silk);add(ST,[13.75,2.6,1.4],[13.75,2.6,2.6],C.silk,.7)}
+/* FSR on the underside (pad side) of the thumb tip */
+{const ring=r=>Array.from({length:20},(_,i)=>[3.18+r*Math.cos(i/20*TAU),-.72,6.72+r*Math.sin(i/20*TAU)]);
+ poly(ST,ring(.6),C.cop);poly(ST,ring(.28),C.cop,.6)}
+
+/* jumpers (sensor → ADS1115 → XIAO), following the README's signal chain */
+const wr=(a,b,lift,c,pulse)=>{const p=wire(ST,a,b,lift,c);if(pulse)PW.push(p)};
+wr([4.1,1.15,.55],[4.9,1.98,-1.4],1,C.cop,1);      /* IMU → ADS (I2C) */
+wr([7.4,2,-1.4],[10,1.78,-1.4],1.2,C.org,1);       /* ADS → XIAO (I2C) */
+wr([10.3,1.8,1.4],[7.4,2,-.95],2.2,C.yel,1);       /* AD8232 → ADS A0 */
+{/* FSR → ADS A1: runs along the thumb's underside, wraps round the palm edge, then arches over to the ADS */
+ const w1=wire(ST,[3.18,-.72,6.72],[7.2,-.83,3.2],0,C.cop,.9,6),w2=wire(ST,[7.2,-.83,3.2],[7.5,0,3.4],0,C.cop,.9,3),
+       w3=wire(ST,[7.5,0,3.4],[7.5,1.45,3.25],0,C.cop,.9,3),w4=wire(ST,[7.5,1.45,3.25],[5.6,2.08,-2.3],1.8,C.cop,.9,10);
+ PW.push(w1.concat(w2.slice(1),w3.slice(1),w4.slice(1)))}
+wr([9.2,1.9,2],[13.1,2.2,2],1.4,C.red,0);          /* battery → switch */
+
+/* EMG electrodes + leads (two pads on the forearm, third lead trailing, as in the photo) */
+function pad(x,th,r){const c=k=>Array.from({length:20},(_,i)=>{const a=i/20*TAU;return bp(x+k*r*Math.cos(a),th+k*r*Math.sin(a)/1.9,1.03)});
+  poly(ST,c(1),C.silk,.9);poly(ST,c(.3),C.silk,.7)}
+const jack=[11.5,2,3.75],J=[12.6,-1.6,5.4],PA=bp(16.4,.15,1.06),PB=bp(20.4,.15,1.06);
+pad(16.4,.15,1.5);pad(20.4,.15,1.5);
+wire(ST,jack,J,-.6,C.silk);wire(ST,J,PA,-1.4,C.yel,.95);wire(ST,J,PB,-1.8,C.red,.95);wire(ST,J,[9.6,-4,6.6],-.8,C.silk,.8);
+
+/* table grid */
+for(let x=-10;x<=24;x+=2)add(GR,[x,-4.4,-8],[x,-4.4,8],C.cop,.14);
+for(let z=-8;z<=8;z+=2)add(GR,[-10,-4.4,z],[24,-4.4,z],C.cop,.14);
+
+const XI=[11.05,2.2,-1.2];
+const LB=[['xiao esp32-c3, esp-now',[11.05,1.95,-1.2]],['ads1115, emg + fsr adc',[6.15,2.1,-1.7]],['bno085 imu, 100 hz',[2.6,1.45,.5]],
+  ['ad8232, forearm emg',[11.7,1.8,1.7]],['lipo battery',[7.8,2.15,1.9]],['2.4 ghz antenna',[4.6,1.35,2.2]],
+  ['fsr, thumb tip grip',[3.18,-.72,6.72]],['emg electrodes',bp(18.4,.15,1.06)],['power switch',[13.75,2.6,2]]];
+
+/* ── State ── */
+let W=0,H=0,yaw=-.4,pitch=.55,zoom=1,vy=0,clock=0,auto=!reduce,flow=false,labels=true;
+let drag=null,tween=null,resume=0,lastMove=0,lastKey='',raf=0,vis=true,last=performance.now();
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+function size(){const d=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;
+  cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);lastKey=''}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  const u=Math.min(W/31,H/14)*zoom,DIST=60;
+  const pr=p=>{const x=p[0]-6.5,y=p[1]-.3,z=p[2],x1=x*cy+z*sy,z1=-x*sy+z*cy,y2=y*cp-z1*sp,z2=y*sp+z1*cp,k=u*DIST/(DIST-z2);
+    return[W/2+x1*k,H*.46-y2*k,z2]};
+  const fade=z=>.4+.6*clamp((z+14)/28,0,1);
+  ctx.lineWidth=1.2;ctx.lineCap='round';
+  const dl=L=>{for(const s of L){const a=pr(s[0]),b=pr(s[1]);
+    ctx.globalAlpha=s[3]*fade((a[2]+b[2])/2);ctx.strokeStyle=s[2];
+    ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}};
+  dl(GR);dl(ST);
+  if(flow){
+    const FX=[];
+    for(let r=0;r<3;r++){const v=(clock*.3+r/3)%1,rad=.8+v*7,pts=[];
+      for(let i=0;i<=28;i++){const a=i/28*TAU;pts.push([XI[0]+rad*Math.cos(a),XI[1],XI[2]+rad*Math.sin(a)])}
+      for(let i=0;i<28;i++)add(FX,pts[i],pts[i+1],C.sig,(1-v)*.8)}
+    dl(FX);
+    ctx.fillStyle=C.sig;
+    PW.forEach((p,wi)=>{for(let k=0;k<2;k++){
+      const v=((clock*.5+k/2+wi*.17)%1)*(p.length-1),i=Math.min(p.length-2,Math.floor(v)),f=v-i,a=p[i],b=p[i+1];
+      const q=pr([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f]);
+      ctx.globalAlpha=.95*fade(q[2]);ctx.beginPath();ctx.arc(q[0],q[1],2.6,0,TAU);ctx.fill()}});
+  }
+  if(labels){
+    ctx.font='11px "IBM Plex Mono",ui-monospace,monospace';ctx.textBaseline='middle';ctx.lineJoin='round';
+    const it=LB.map(([t,p])=>{const a=pr(p),w=ctx.measureText(t).width;let r=a[0]>=W/2;
+      if(r&&a[0]+32+w>W-8)r=false;else if(!r&&a[0]-32-w<8)r=true;return{t,a,w,r}});
+    [true,false].forEach(side=>{let prev=-1e9;   /* stack labels on each side so they don't overlap */
+      it.filter(i=>i.r===side).sort((p,q)=>p.a[1]-q.a[1]).forEach(i=>{i.ty=Math.max(i.a[1],prev+16);prev=i.ty})});
+    for(const i of it){
+      const x2=i.a[0]+(i.r?22:-22),tx=x2+(i.r?5:-5);
+      ctx.globalAlpha=fade(i.a[2]);
+      ctx.strokeStyle='rgba(233,239,234,.5)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(i.a[0],i.a[1]);ctx.lineTo(x2,i.ty);ctx.stroke();
+      ctx.fillStyle=C.sig;ctx.beginPath();ctx.arc(i.a[0],i.a[1],2.5,0,TAU);ctx.fill();
+      ctx.textAlign=i.r?'left':'right';
+      ctx.lineWidth=3;ctx.strokeStyle='#08110d';ctx.strokeText(i.t,tx,i.ty);
+      ctx.fillStyle=C.silk;ctx.fillText(i.t,tx,i.ty);
+    }
+  }
+  ctx.globalAlpha=1;
+}
+
+function tick(t){
+  raf=requestAnimationFrame(tick);
+  if(!vis){cancelAnimationFrame(raf);raf=0;return}
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(tween){
+    yaw+=(tween.y-yaw)*.14;pitch+=(tween.p-pitch)*.14;zoom+=(tween.z-zoom)*.14;
+    if(Math.abs(tween.y-yaw)+Math.abs(tween.p-pitch)+Math.abs(tween.z-zoom)<.003){yaw=tween.y;pitch=tween.p;zoom=tween.z;tween=null}
+  }else if(!drag){
+    if(Math.abs(vy)>.0004){yaw+=vy;vy*=.92}
+    else if(auto&&t>resume)yaw+=dt*.35;
+  }
+  if(flow)clock+=dt;
+  const key=[yaw,pitch,zoom,flow?clock:0,W,H,labels].join();
+  if(key!==lastKey){lastKey=key;draw()}
+}
+
+/* ── Input ── */
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};vy=0;tween=null;cv.setPointerCapture(e.pointerId);cv.classList.add('drag')});
+cv.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+  yaw+=dx*.008;vy=dx*.008;lastMove=performance.now();
+  if(e.pointerType==='mouse')pitch=clamp(pitch+dy*.006,-1.5,1.5);
+});
+const end=()=>{if(!drag)return;drag=null;cv.classList.remove('drag');
+  if(performance.now()-lastMove>60)vy=0;resume=performance.now()+2500};
+cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+cv.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();tween=null;
+  zoom=clamp(zoom*Math.exp(-e.deltaY*.01),.6,2.5)},{passive:false});
+cv.addEventListener('keydown',e=>{
+  const k=e.key;let h=1;
+  if(k==='ArrowLeft')yaw-=.12;else if(k==='ArrowRight')yaw+=.12;
+  else if(k==='ArrowUp')pitch=Math.min(1.5,pitch+.08);else if(k==='ArrowDown')pitch=Math.max(-1.5,pitch-.08);
+  else if(k==='+'||k==='=')zoom=Math.min(2.5,zoom*1.1);else if(k==='-')zoom=Math.max(.6,zoom/1.1);else h=0;
+  if(h){e.preventDefault();tween=null;resume=performance.now()+2500}
+});
+
+const VIEWS={iso:[-.4,.55,1],side:[0,.04,1],top:[0,1.5,1],palm:[0,-1.5,1]};
+const bAuto=document.getElementById('gl-auto');
+const goto=n=>{const [y,p,z]=VIEWS[n],d=((y-yaw+Math.PI)%TAU+TAU)%TAU-Math.PI;tween={y:yaw+d,p,z};vy=0};
+document.querySelectorAll('#wf-glove [data-v]').forEach(b=>b.addEventListener('click',()=>{
+  goto(b.dataset.v);auto=false;bAuto.setAttribute('aria-pressed','false')}));
+cv.addEventListener('dblclick',()=>goto('iso'));
+const tog=(id,set)=>{const b=document.getElementById(id);
+  b.addEventListener('click',()=>{const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);set(v)})};
+tog('gl-auto',v=>{auto=v;resume=0});
+tog('gl-flow',v=>flow=v);
+tog('gl-lab',v=>labels=v);
+if(reduce)bAuto.setAttribute('aria-pressed','false');
+
+/* ── Boot ── */
+new ResizeObserver(size).observe(cv);
+new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(vis&&!raf){last=performance.now();raf=requestAnimationFrame(tick)}}).observe(cv);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>lastKey='');
+const lb=document.getElementById('gl-lab');if(cv.clientWidth<700){labels=false;lb.setAttribute('aria-pressed','false')}
+size();raf=requestAnimationFrame(tick);
 })();
 </script>
 </body>
