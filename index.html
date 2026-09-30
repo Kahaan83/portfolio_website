@@ -603,18 +603,6 @@
   .hw-card:has(.wf :focus-visible){outline:none;background:var(--mask)}
   .hw-card:has(.wf :focus-visible):hover{background:var(--mask-lit)}
 
-  /* Empty slot reserved for the line follower model. Same box as .wf so U2 and U3 line up. */
-  .wf-slot{
-    position:relative;z-index:2;width:100%;aspect-ratio:4/3;min-height:340px;margin:0 0 26px;
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    border:1px dashed var(--rule-lit);
-    background:
-      repeating-linear-gradient(90deg,rgba(196,131,74,.025) 0 1px,transparent 1px 44px),
-      repeating-linear-gradient(0deg,rgba(196,131,74,.025) 0 1px,transparent 1px 44px),
-      var(--board-deep);
-  }
-  .wf-slot span{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--silk-faint)}
-  .wf-slot .sub{font-size:11px;color:var(--copper-dim);margin-top:6px}
 
   /* ============ EXPERIENCE ============ */
   #experience{background:var(--board);padding:110px 0}
@@ -768,7 +756,7 @@
     .ct-link{flex-direction:column;align-items:flex-start;gap:6px}
     .ct-what{width:auto}
     .hw-card.flagship{padding:28px 22px 24px}
-    .wf,.hw-card.wide .wf,.wf-slot{aspect-ratio:auto;height:420px;min-height:0}
+    .wf,.hw-card.wide .wf{aspect-ratio:auto;height:420px;min-height:0}
     .wf-bar button{padding:6px 8px}
     .sw-row::before{left:-22px}
     .sw-stack,.bom-row,.ct-what,.exp-when,.sw-open,.hw-action,.sw-demo,.foot-in,.fact dt,.desig{font-size:12px}
@@ -1062,7 +1050,7 @@
         <!-- 3D MODEL: self-balancing robot (canvas, no iframe; script is in the page footer) -->
         <figure class="wf" id="wf-robot">
           <canvas id="rb-cv" tabindex="0" role="img" aria-label="Interactive wireframe 3D model of the two-wheeled self-balancing robot with an LCD on its front panel. Drag or use the arrow keys to rotate, plus and minus to zoom."></canvas>
-          <div class="wf-cap"><b>Wireframe model</b>proportions traced from a photo</div>
+          <div class="wf-cap"><b>Wireframe model</b></div>
           <div class="wf-bar" role="group" aria-label="Robot model controls">
             <button type="button" data-v="iso">3/4</button><button type="button" data-v="front">front</button><button type="button" data-v="side">side</button><button type="button" data-v="top">top</button>
             <span class="wf-sep" aria-hidden="true"></span>
@@ -1097,7 +1085,7 @@
         <!-- 3D MODEL: sensor glove -->
         <figure class="wf" id="wf-glove">
           <canvas id="gl-cv" tabindex="0" role="img" aria-label="Interactive wireframe 3D model of the sensor glove: a microcontroller, IMU, ADC, EMG front end, battery and antenna on the back of the hand, a force sensor on the thumb, and two electrode pads on the forearm. Drag or use the arrow keys to rotate, plus and minus to zoom."></canvas>
-          <div class="wf-cap"><b>Wireframe model</b>traced from photos of the glove</div>
+          <div class="wf-cap"><b>Wireframe model</b></div>
           <div class="wf-bar" role="group" aria-label="Glove model controls">
             <button type="button" data-v="iso">3/4</button><button type="button" data-v="side">side</button><button type="button" data-v="top">top</button><button type="button" data-v="palm">palm</button>
             <span class="wf-sep" aria-hidden="true"></span>
@@ -1130,14 +1118,20 @@
         <p class="hw-desc">
           The one that came first. An IR sensor array feeding real-time steering correction — simple enough to fully understand, which is exactly what made everything after it possible.
         </p>
-        <!-- LINE FOLLOWER MODEL SLOT.
-             Same box as the glove figure so the two cards stay aligned.
-             When the wireframe is ready: replace this <div> with a <figure class="wf" id="wf-line">
-             (copy the glove block above), and add its script next to the other two at the bottom of the page.
-             To hide the slot until then, delete this block or add the `hidden` attribute. -->
-        <div class="wf-slot" role="img" aria-label="Space reserved for a 3D model of the line follower">
-          <div><span>LINE FOLLOWER · 3D MODEL</span><span class="sub">wireframe in progress</span></div>
-        </div>
+        <!-- 3D MODEL: PID line follower -->
+        <figure class="wf" id="wf-line">
+          <canvas id="ln-cv" tabindex="0" role="img" aria-label="Interactive wireframe 3D model of a two-wheeled line follower robot with a perfboard chassis and a row of five infrared sensor modules at the front. Drag or use the arrow keys to rotate, plus and minus to zoom."></canvas>
+          <div class="wf-cap"><b>Wireframe model</b></div>
+          <div class="wf-bar" role="group" aria-label="Line follower model controls">
+            <button type="button" data-v="iso">3/4</button><button type="button" data-v="front">front</button><button type="button" data-v="side">side</button><button type="button" data-v="top">top</button>
+            <span class="wf-sep" aria-hidden="true"></span>
+            <button type="button" id="ln-auto" aria-pressed="true">auto-rotate</button>
+            <button type="button" id="ln-spin" aria-pressed="false">spin wheels</button>
+            <button type="button" id="ln-lab" aria-pressed="true">labels</button>
+            <span class="wf-hint m">drag to rotate · ctrl + scroll to zoom</span><span class="wf-hint t">swipe sideways to rotate</span>
+          </div>
+          <noscript>3D model needs JavaScript</noscript>
+        </figure>
 
         <dl class="bom">
           <div class="bom-row"><dt>SENSING</dt><dd>IR reflectance array</dd></div>
@@ -2120,6 +2114,234 @@ new ResizeObserver(size).observe(cv);
 new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(vis&&!raf){last=performance.now();raf=requestAnimationFrame(tick)}}).observe(cv);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>lastKey='');
 const lb=document.getElementById('gl-lab');if(cv.clientWidth<700){labels=false;lb.setAttribute('aria-pressed','false')}
+size();raf=requestAnimationFrame(tick);
+})();
+
+/* ── Wireframe model: PID line follower ── */
+(()=>{
+const cv=document.getElementById('ln-cv'),ctx=cv.getContext('2d');
+const TAU=Math.PI*2, reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const C={board:'#c4834a',grid:'#c4834a',pin:'#7d8c83',bolt:'#e9efea',motor:'#e9efea',mod:'#1f8a52',pot:'#5b9cf5',ic:'#3ddc84',led:'#ff5a4d',emit:'#e9efea',photo:'#8ea497',tire:'#8ea497',rim:'#c4834a',bat:'#e8964f',drv:'#ff5a4d'};
+
+/* ── Geometry ── 1 unit ≈ 1/100 of the chassis width. x = right, y = up, z = toward the sensor array.
+   Depths and heights that the photos don't show are estimates: tweak to taste. */
+const add=(L,a,b,c,al=1)=>L.push([a,b,c,al]);
+const poly=(L,p,c,al)=>p.forEach((v,i)=>add(L,v,p[(i+1)%p.length],c,al));
+const rectXY=(L,z,x0,x1,y0,y1,c,al)=>poly(L,[[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]],c,al);
+const rectXZ=(L,y,x0,x1,z0,z1,c,al)=>poly(L,[[x0,y,z0],[x1,y,z0],[x1,y,z1],[x0,y,z1]],c,al);
+const box=(L,x0,x1,y0,y1,z0,z1,c,al)=>{rectXY(L,z0,x0,x1,y0,y1,c,al);rectXY(L,z1,x0,x1,y0,y1,c,al);
+  [[x0,y0],[x1,y0],[x1,y1],[x0,y1]].forEach(([x,y])=>add(L,[x,y,z0],[x,y,z1],c,al))};
+
+const ST=[], GR=[], WI=[];
+const BW=3.7,BL=6,BY=2.3,BT=.15;      /* perfboard half width, half length, top height, thickness */
+const WZ=-1.5,WR=1.65;                /* axle position (z) and wheel radius */
+
+/* perfboard: slab + hole grid */
+rectXZ(ST,BY,-BW,BW,-BL,BL,C.board);rectXZ(ST,BY-BT,-BW,BW,-BL,BL,C.board,.6);
+[[-BW,-BL],[BW,-BL],[BW,BL],[-BW,BL]].forEach(([x,z])=>add(ST,[x,BY,z],[x,BY-BT,z],C.board));
+for(let x=-BW+.5;x<BW;x+=.6)add(ST,[x,BY,-BL],[x,BY,BL],C.grid,.13);
+for(let z=-BL+.5;z<BL;z+=.6)add(ST,[-BW,BY,z],[BW,BY,z],C.grid,.13);
+
+/* five IR sensor modules hanging off the front edge */
+for(let i=0;i<5;i++){
+  const cx=(i-2)*1.4,z=BL+.1;
+  rectXY(ST,z,cx-.62,cx+.62,.55,BY-BT,C.mod);
+  rectXY(ST,z+.06,cx-.62,cx+.62,.55,BY-BT,C.mod,.35);
+  rectXY(ST,z+.06,cx-.36,cx+.06,1.45,1.9,C.pot);              /* trim pot */
+  add(ST,[cx-.3,1.68,z+.06],[cx,1.68,z+.06],C.pot,.6);
+  rectXY(ST,z+.06,cx+.2,cx+.5,1.15,1.6,C.ic);                  /* comparator IC */
+  [-.36,.36].forEach(d=>rectXY(ST,z+.06,cx+d-.09,cx+d+.09,1.98,2.12,C.led));   /* status LEDs */
+  bulb(cx-.3,BL+.36,C.photo);bulb(cx+.3,BL+.36,C.emit);           /* photodiode + IR emitter */
+  [-.2,0,.2].forEach(d=>add(ST,[cx+d,BY,BL-.3],[cx+d,BY+.4,BL-.3],C.pin));   /* 3-pin header */
+}
+
+/* rear standoffs: motor driver on the left set, battery holder on the right set */
+const TY=BY+.8,DZ=-4.5,DX=-2.3,BX=2.3;
+[DX,BX].forEach(cx=>[[-.9,-.9],[.9,-.9],[-.9,.9],[.9,.9]].forEach(([a,b])=>{
+  const x=cx+a,z=DZ+b;add(ST,[x,BY,z],[x,TY,z],C.bolt,.8);
+  rectXZ(ST,BY,x-.12,x+.12,z-.12,z+.12,C.bolt,.5);rectXZ(ST,TY,x-.12,x+.12,z-.12,z+.12,C.bolt,.8)}));
+/* motor driver (L298N style): board, heatsink, terminal blocks, control header */
+rectXZ(ST,TY,DX-1.1,DX+1.1,DZ-1.1,DZ+1.1,C.drv);rectXZ(ST,TY+.12,DX-1.1,DX+1.1,DZ-1.1,DZ+1.1,C.drv,.6);
+[[-1.1,-1.1],[1.1,-1.1],[1.1,1.1],[-1.1,1.1]].forEach(([a,b])=>add(ST,[DX+a,TY,DZ+b],[DX+a,TY+.12,DZ+b],C.drv));
+box(ST,DX-.5,DX+.5,TY+.12,TY+1,DZ-.35,DZ+.35,C.motor,.9);
+for(let k=0;k<5;k++){const x=DX-.4+k*.2;add(ST,[x,TY+1,DZ-.35],[x,TY+1,DZ+.35],C.motor,.6)}
+[[-1,[-3.85,-4.25]],[1,[-3.85,-4.25,-4.85,-5.25]]].forEach(([s,zs])=>zs.forEach(z=>
+  box(ST,DX+s-.15,DX+s+.15,TY+.12,TY+.42,z-.17,z+.17,C.pot)));
+for(let j=0;j<6;j++){const x=DX-.5+.2*j;add(ST,[x,TY+.12,DZ+1],[x,TY+.42,DZ+1],C.pin)}
+/* batteries: holder + three cells */
+box(ST,BX-1.1,BX+1.1,TY,TY+.75,DZ-1.1,DZ+1.1,C.pin,.45);
+[-.7,0,.7].forEach(d=>{const cx=BX+d,cy=TY+.45;
+  [DZ-.95,DZ+.95].forEach(z=>{for(let i=0;i<14;i++){const a=i/14*TAU,b=(i+1)/14*TAU;
+    add(ST,[cx+.33*Math.cos(a),cy+.33*Math.sin(a),z],[cx+.33*Math.cos(b),cy+.33*Math.sin(b),z],C.bat)}});
+  for(let k=0;k<4;k++){const a=k*TAU/4;add(ST,[cx+.33*Math.cos(a),cy+.33*Math.sin(a),DZ-.95],[cx+.33*Math.cos(a),cy+.33*Math.sin(a),DZ+.95],C.bat,.7)}});
+
+/* two rows of female header pins for the Arduino, centred on the board */
+[-.55,.55].forEach(z=>{for(let i=0;i<15;i++){const x=-1.75+i*.25;add(ST,[x,BY,z],[x,BY+.4,z],C.pin,.9)}
+  add(ST,[-1.87,BY+.4,z],[1.87,BY+.4,z],C.pin,.5)});
+
+/* gear motors + axles */
+[-1,1].forEach(s=>{
+  box(ST,s>0?1.1:-3.4,s>0?3.4:-1.1,WR-.4,WR+.4,WZ-.6,WZ+.6,C.motor);
+  add(ST,[s*3.4,WR,WZ],[s*4.6,WR,WZ],C.rim)});
+
+/* ground grid */
+for(let i=-9;i<=9;i++){add(GR,[i,0,-9],[i,0,9],C.grid,.16);add(GR,[-9,0,i],[9,0,i],C.grid,.16)}
+
+/* LED-style bulb hanging down: flange, cylinder body, hemispherical dome */
+function bulb(x,z,c){const r=.17,yt=.55,yb=.35;
+  const ring=(y,rr,al)=>{for(let i=0;i<14;i++){const a=i/14*TAU,b=(i+1)/14*TAU;
+    add(ST,[x+rr*Math.cos(a),y,z+rr*Math.sin(a)],[x+rr*Math.cos(b),y,z+rr*Math.sin(b)],c,al)}};
+  ring(yt,r+.05);ring(yb,r);
+  for(let k=0;k<4;k++){const a=k*TAU/4,ca=Math.cos(a),sa=Math.sin(a);
+    add(ST,[x+r*ca,yt,z+r*sa],[x+r*ca,yb,z+r*sa],c,.8);
+    let p=[x+r*ca,yb,z+r*sa];
+    for(let i=1;i<=6;i++){const f=i/6*Math.PI/2,q=[x+r*Math.cos(f)*ca,yb-r*Math.sin(f),z+r*Math.cos(f)*sa];add(ST,p,q,c);p=q}}
+  [Math.PI/6,Math.PI/3].forEach(f=>ring(yb-r*Math.sin(f),r*Math.cos(f),.6))}
+
+/* wires lie flat on the board: straight runs along x / z with rounded corners */
+function run(L,pts,c,rd=.14){
+  pts=pts.filter((p,i)=>!i||Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1],p[2]-pts[i-1][2])>1e-6);
+  const V=(a,b)=>[b[0]-a[0],b[1]-a[1],b[2]-a[2]],len=v=>Math.hypot(v[0],v[1],v[2]);let cur=pts[0];
+  for(let i=1;i<pts.length-1;i++){const a=pts[i-1],b=pts[i],e=pts[i+1],u=V(b,a),w=V(b,e),lu=len(u),lw=len(w),r=Math.min(rd,lu/2,lw/2);
+    const p1=[0,1,2].map(k=>b[k]+u[k]/lu*r),p2=[0,1,2].map(k=>b[k]+w[k]/lw*r);
+    add(L,cur,p1,c);cur=p1;
+    for(let j=1;j<=6;j++){const t=j/6,mm=1-t,q=[0,1,2].map(k=>mm*mm*p1[k]+2*mm*t*b[k]+t*t*p2[k]);add(L,cur,q,c);cur=q}}
+  add(L,cur,pts[pts.length-1],c)}
+const YB=BY+.05,PT=BY+.32;   /* wire height on the board, pin-tip height */
+
+/* IR sensors -> Arduino front row: five signal wires (A0-A4) + shared VCC / GND buses */
+const SIG=['#ffd23f','#5b9cf5','#c47aff','#3ddc84','#ff9a3c'],LANE=[2,3,0,3,2];
+for(let m=0;m<5;m++){const cx=(m-2)*1.4,tx=-.5+m*.25,ln=LANE[m];
+  run(WI,ln?[[cx,PT,5.7],[cx,YB,5.7],[cx,YB,ln],[tx,YB,ln],[tx,YB,.55],[tx,PT,.55]]
+          :[[cx,PT,5.7],[cx,YB,5.7],[tx,YB,.55],[tx,PT,.55]],SIG[m]);
+  run(WI,[[cx-.2,PT,5.7],[cx-.2,YB,5.7],[cx-.2,YB,5]],'#ff5a4d');
+  run(WI,[[cx+.2,PT,5.7],[cx+.2,YB,5.7],[cx+.2,YB,4.5]],'#9aa7a0')}
+run(WI,[[-3,YB,5],[2.6,YB,5]],'#ff5a4d');run(WI,[[-1.5,YB,5],[-1.5,YB,.55],[-1.5,PT,.55]],'#ff5a4d');
+run(WI,[[-2.6,YB,4.5],[3,YB,4.5]],'#9aa7a0');run(WI,[[1.5,YB,4.5],[1.5,YB,.55],[1.5,PT,.55]],'#9aa7a0');
+
+/* motor driver control header -> Arduino rear row */
+const CT=['#ffd23f','#ff9a3c','#c47aff','#5b9cf5','#3ddc84','#e9efea'];
+for(let j=0;j<6;j++){const sx=DX-.5+.2*j,tx=-.75+.25*j,zl=-1.2-.25*j;
+  run(WI,[[sx,TY+.42,DZ+1],[sx,TY+.42,-3.15],[sx,YB,-3.15],[sx,YB,zl],[tx,YB,zl],[tx,YB,-.55],[tx,PT,-.55]],CT[j])}
+
+/* driver -> motors: drop to the board, run flat, leave over the edge and into the motor */
+[[-3.85,-1.2,-3.5,'#ffd23f'],[-4.25,-1.8,-3.6,'#e9efea']].forEach(([zt,zm,xd,c])=>
+  run(WI,[[DX-1.15,TY+.27,zt],[xd,TY+.27,zt],[xd,YB,zt],[xd,YB,zm],[-3.9,YB,zm],[-3.9,WR+.4,zm],[-3.4,WR,zm]],c));
+[[-3.85,-1.05,-2.6,3.95,-1.2,'#ffd23f'],[-4.25,-.85,-3,3.85,-1.8,'#e9efea']].forEach(([zt,xd,zc,xo,zm,c])=>
+  run(WI,[[DX+1.15,TY+.27,zt],[xd,TY+.27,zt],[xd,YB,zt],[xd,YB,zc],[xo,YB,zc],[xo,WR+.4,zc],[xo,WR+.4,zm],[3.4,WR,zm]],c));
+/* battery -> driver power */
+[[-4.85,'#ff5a4d'],[-5.25,'#9aa7a0']].forEach(([z,c])=>
+  run(WI,[[BX-1.1,TY+.4,z],[1,TY+.4,z],[1,YB,z],[-1.05,YB,z],[-1.05,TY+.27,z],[DX+1.15,TY+.27,z]],c));
+
+/* wheels are rebuilt each frame so the tread can spin */
+function wheel(L,s,spin){
+  const cx=4.65*s,hw=.55,R=WR,xo=cx+s*hw,xi=cx-s*hw;
+  const P=(x,r,a)=>[x,WR+r*Math.cos(a),WZ+r*Math.sin(a)];
+  const ring=(x,r,c,al)=>{for(let i=0;i<36;i++)add(L,P(x,r,i/36*TAU),P(x,r,(i+1)/36*TAU),c,al)};
+  ring(xo,R,C.tire);ring(xi,R,C.tire,.7);ring(xo,R-.25,C.tire,.5);
+  ring(xo,1.0,C.rim);ring(xo,.3,C.rim);
+  for(let k=0;k<28;k++){const t=k/28*TAU+spin;add(L,P(xi,R,t),P(xo,R,t),C.tire,.8)}   /* straight lateral grooves */
+  for(let k=0;k<4;k++){const t=k/4*TAU+spin;add(L,P(xo,.3,t),P(xo,1.0,t),C.rim)}
+}
+
+const LB=[['5-ch ir array',[2.8,1.0,BL+.16]],['sensitivity pot',[-2.95,1.67,BL+.16]],['ir bulbs',[.3,.4,BL+.36]],
+          ['perfboard chassis',[BW,BY,-2.5]],['arduino header pins',[1.87,BY+.4,.55]],['motor driver',[DX,TY+1,DZ]],['batteries',[BX+.7,TY+.75,DZ]],['standoffs',[DX-.9,BY+.5,DZ-.9]],
+          ['gear motor',[3.4,WR,WZ]],['wheel, ribbed tread',[4.65,WR+1.5,WZ]]];
+
+/* ── State ── */
+let W=0,H=0,yaw=-.6,pitch=.42,zoom=1,vy=0,spin=0,auto=!reduce,spinOn=false,labels=true;
+let drag=null,tween=null,resume=0,lastMove=0,lastKey='',raf=0,vis=true,last=performance.now();
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+function size(){const d=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;
+  cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);lastKey=''}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  const u=Math.min(W/15,H/13)*zoom,DIST=40;
+  const pr=p=>{const y=p[1]-2,z=p[2],x1=p[0]*cy+z*sy,z1=-p[0]*sy+z*cy,y2=y*cp-z1*sp,z2=y*sp+z1*cp,k=u*DIST/(DIST-z2);
+    return[W/2+x1*k,H*.42-y2*k,z2]};
+  const fade=z=>.4+.6*clamp((z+7)/14,0,1);
+  ctx.lineWidth=1.2;ctx.lineCap='round';
+  const dl=L=>{for(const s of L){const a=pr(s[0]),b=pr(s[1]);
+    ctx.globalAlpha=s[3]*fade((a[2]+b[2])/2);ctx.strokeStyle=s[2];
+    ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}};
+  dl(GR);dl(ST);ctx.lineWidth=1.8;dl(WI);ctx.lineWidth=1.2;
+  const WL=[];wheel(WL,-1,-spin);wheel(WL,1,spin);dl(WL);
+  if(labels){
+    ctx.font='11px "IBM Plex Mono",ui-monospace,monospace';ctx.textBaseline='middle';
+    for(const [t,p] of LB){
+      const a=pr(p),w=ctx.measureText(t).width;let right=a[0]>=W/2;
+      if(right&&a[0]+30+w>W-8)right=false;else if(!right&&a[0]-30-w<8)right=true;
+      const x2=a[0]+(right?22:-22);
+      ctx.globalAlpha=fade(a[2]);
+      ctx.strokeStyle='rgba(233,239,234,.5)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(x2,a[1]);ctx.stroke();
+      ctx.fillStyle='#3ddc84';ctx.beginPath();ctx.arc(a[0],a[1],2.5,0,TAU);ctx.fill();
+      ctx.fillStyle='#e9efea';ctx.textAlign=right?'left':'right';
+      ctx.fillText(t,x2+(right?5:-5),a[1]);
+    }
+  }
+  ctx.globalAlpha=1;
+}
+
+function tick(t){
+  raf=requestAnimationFrame(tick);
+  if(!vis){cancelAnimationFrame(raf);raf=0;return}
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(tween){
+    yaw+=(tween.y-yaw)*.14;pitch+=(tween.p-pitch)*.14;zoom+=(tween.z-zoom)*.14;
+    if(Math.abs(tween.y-yaw)+Math.abs(tween.p-pitch)+Math.abs(tween.z-zoom)<.003){yaw=tween.y;pitch=tween.p;zoom=tween.z;tween=null}
+  }else if(!drag){
+    if(Math.abs(vy)>.0004){yaw+=vy;vy*=.92}
+    else if(auto&&t>resume)yaw+=dt*.35;
+  }
+  if(spinOn)spin+=dt*2.2;
+  const key=[yaw,pitch,zoom,spin,W,H,labels].join();
+  if(key!==lastKey){lastKey=key;draw()}
+}
+
+/* ── Input ── */
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};vy=0;tween=null;cv.setPointerCapture(e.pointerId);cv.classList.add('drag')});
+cv.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+  yaw+=dx*.008;vy=dx*.008;lastMove=performance.now();
+  if(e.pointerType==='mouse')pitch=clamp(pitch+dy*.006,-.35,1.5);
+});
+const end=()=>{if(!drag)return;drag=null;cv.classList.remove('drag');
+  if(performance.now()-lastMove>60)vy=0;resume=performance.now()+2500};
+cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+cv.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();tween=null;
+  zoom=clamp(zoom*Math.exp(-e.deltaY*.01),.6,2.5)},{passive:false});
+cv.addEventListener('keydown',e=>{
+  const k=e.key;let h=1;
+  if(k==='ArrowLeft')yaw-=.12;else if(k==='ArrowRight')yaw+=.12;
+  else if(k==='ArrowUp')pitch=Math.min(1.5,pitch+.08);else if(k==='ArrowDown')pitch=Math.max(-.35,pitch-.08);
+  else if(k==='+'||k==='=')zoom=Math.min(2.5,zoom*1.1);else if(k==='-')zoom=Math.max(.6,zoom/1.1);else h=0;
+  if(h){e.preventDefault();tween=null;resume=performance.now()+2500}
+});
+
+const VIEWS={iso:[-.6,.42,1],front:[0,.04,1],side:[Math.PI/2,.04,1],top:[0,1.5,1]};
+const bAuto=document.getElementById('ln-auto');
+function setAuto(v){auto=v;bAuto.setAttribute('aria-pressed',v)}
+document.querySelectorAll('#wf-line [data-v]').forEach(b=>b.addEventListener('click',()=>{
+  const [y,p,z]=VIEWS[b.dataset.v],d=((y-yaw+Math.PI)%TAU+TAU)%TAU-Math.PI;
+  tween={y:yaw+d,p,z};vy=0;setAuto(false)}));
+cv.addEventListener('dblclick',()=>{const [y,p,z]=VIEWS.iso;tween={y:yaw+((y-yaw+Math.PI)%TAU+TAU)%TAU-Math.PI,p,z}});
+const tog=(id,set)=>{const b=document.getElementById(id);
+  b.addEventListener('click',()=>{const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);set(v)})};
+tog('ln-auto',v=>{auto=v;resume=0});
+tog('ln-spin',v=>spinOn=v);
+tog('ln-lab',v=>labels=v);
+if(reduce)bAuto.setAttribute('aria-pressed','false');
+
+/* ── Boot ── */
+new ResizeObserver(size).observe(cv);
+new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(vis&&!raf){last=performance.now();raf=requestAnimationFrame(tick)}}).observe(cv);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>lastKey='');
+const lb=document.getElementById('ln-lab');if(cv.clientWidth<700){labels=false;lb.setAttribute('aria-pressed','false')}
 size();raf=requestAnimationFrame(tick);
 })();
 </script>
